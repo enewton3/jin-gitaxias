@@ -17,6 +17,19 @@ intents.add(
 const emotes = (str) =>
   str.match(/<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu);
 
+const trackedEmotes = [
+  ":bomb:",
+  ":bombisland: ",
+  ":massbomb: ",
+  ":calibomb: ",
+  ":connectibomb: ",
+  ":kentuckybombedchicken: ",
+  ":nanbomb: ",
+  ":nebomba: ",
+  ":texbomb: ",
+  ":thebombapple:",
+];
+
 const client = new Client({ intents: intents });
 
 client.on("ready", () => {
@@ -24,13 +37,14 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async (msg) => {
-  console.log(msg.content);
   console.log("emotes: ", emotes(msg.content));
   if (msg.content.includes("ping")) {
     msg.reply("pong");
   }
   if (msg.content.includes("bomb")) {
     console.log(msg.author);
+    console.log(msg);
+    msg.reply("nice");
   }
 });
 
