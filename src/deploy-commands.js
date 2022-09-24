@@ -7,8 +7,8 @@ const botId = process.env.BOT_TOKEN;
 
 const commands = [
   new SlashCommandBuilder()
-    .setName("ping")
-    .setDescription("Replies with pong!"),
+    .setName("myBombStats")
+    .setDescription("Replies with your bomb stats!"),
   new SlashCommandBuilder()
     .setName("server")
     .setDescription("Replies with server info!"),

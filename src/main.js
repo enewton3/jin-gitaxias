@@ -3,6 +3,7 @@ require("dotenv").config();
 const botId = process.env.BOT_TOKEN;
 
 const { Client, IntentsBitField } = require("discord.js");
+const { sendData } = require("./firebase-utils");
 
 const intents = new IntentsBitField();
 
@@ -38,16 +39,22 @@ client.on("ready", () => {
 
 client.on("messageCreate", async (msg) => {
   console.log("emotes: ", emotes(msg.content));
+
   if (msg.content.includes("ping")) {
     msg.reply("pong");
   }
+
   if (msg.content.includes("bomb")) {
-    console.log(msg.author);
-    console.log(msg);
+    const dataToSend = {
+      timestamp: msg.createdTimestamp,
+      author: msg.author.username,
+      content: msg.content,
+    };
+
+    sendData(dataToSend, msg.author.username);
+
     msg.reply("nice");
   }
 });
-
-// client.on("messageCreate", (msg) => {});
 
 client.login(botId);
