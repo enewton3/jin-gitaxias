@@ -9,4 +9,7 @@
     "dotenv": "^16.0.2",
     "firebase": "^9.10.0"
   }
+  "scripts": {
+    "start": "node src/main.js"
+  }
 }
