@@ -50,7 +50,7 @@ client.on("messageCreate", async (msg) => {
       author: msg.author.username,
       content: msg.content,
     };
-
+    console.log(dataToSend);
     sendData(dataToSend, msg.author.username);
 
     msg.reply("nice");
