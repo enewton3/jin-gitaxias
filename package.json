@@ -1,0 +1,12 @@
+{
+  "name": "jin-gitaxias",
+  "version": "1.0.0",
+  "description": "A discord bot",
+  "main": "source.js",
+  "author": "Evyn Newton",
+  "dependencies": {
+    "discord.js": "^14.4.0",
+    "dotenv": "^16.0.2",
+    "firebase": "^9.10.0"
+  }
+}
