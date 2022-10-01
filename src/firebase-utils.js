@@ -1,5 +1,6 @@
 const { initializeApp } = require("firebase/app");
 const { getDatabase, ref, set } = require("firebase/database");
+const { getNiceDate } = require("./time-utils");
 
 require("dotenv").config();
 
@@ -17,10 +18,11 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 const sendData = (payload, username) => {
-  const date = new Date(payload.timestamp);
-  const localeDate = date.toString();
   try {
-    set(ref(db, `/bombMessages/${localeDate}/${payload.author}`), payload);
+    set(
+      ref(db, `/bombMessages/${username}/${getNiceDate(payload.timestamp)}`),
+      payload
+    );
   } catch (e) {
     console.log(e);
   }

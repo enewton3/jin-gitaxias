@@ -3,7 +3,9 @@ require("dotenv").config();
 const botId = process.env.BOT_TOKEN;
 
 const { Client, IntentsBitField } = require("discord.js");
+const { emotes, includesBomb } = require("./emotes-utils");
 const { sendData } = require("./firebase-utils");
+const { isFourTwenty, getNiceTime, getNiceDate } = require("./time-utils");
 
 const intents = new IntentsBitField();
 
@@ -15,22 +17,6 @@ intents.add(
   // IntentsBitField.Flags.GuildMembers
 );
 
-const emotes = (str) =>
-  str.match(/<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu);
-
-const trackedEmotes = [
-  ":bomb:",
-  ":bombisland: ",
-  ":massbomb: ",
-  ":calibomb: ",
-  ":connectibomb: ",
-  ":kentuckybombedchicken: ",
-  ":nanbomb: ",
-  ":nebomba: ",
-  ":texbomb: ",
-  ":thebombapple:",
-];
-
 const client = new Client({ intents: intents });
 
 client.on("ready", () => {
@@ -38,17 +24,23 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async (msg) => {
-  console.log("emotes: ", emotes(msg.content));
+  // console.log("emotes: ", emotes(msg.content));
 
-  if (msg.content.includes("ping")) {
-    msg.reply("pong");
+  // if (msg.content.includes("ping")) {
+  //   msg.reply("pong");
+  // }
+  if (msg.author === "Jin-Gitaxias") {
+    console.log("it me");
+    return;
   }
-
-  if (msg.content.includes("bomb")) {
+  if (includesBomb(msg.content)) {
     const dataToSend = {
-      timestamp: msg.createdTimestamp,
+      discordTimestamp: msg.createdTimestamp,
       author: msg.author.username,
       content: msg.content,
+      niceDate: getNiceDate(msg.createdTimestamp),
+      niceTime: getNiceTime(msg.createdTimestamp),
+      isFourTwenty: isFourTwenty(msg.createdTimestamp),
     };
     console.log(dataToSend);
     sendData(dataToSend, msg.author.username);
