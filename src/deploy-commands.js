@@ -7,8 +7,8 @@ const botId = process.env.BOT_TOKEN;
 
 const commands = [
   new SlashCommandBuilder()
-    .setName("myBombStats")
-    .setDescription("Replies with your bomb stats!"),
+    .setName("mybombstats")
+    .setDescription("Replies with your bomb stats!").,
   new SlashCommandBuilder()
     .setName("server")
     .setDescription("Replies with server info!"),
@@ -23,7 +23,7 @@ const rest = new REST({ version: "10" }).setToken(botId);
 
 rest
   .put(Routes.applicationGuildCommands(clientId, guildId), {
-    body: emptyCommands,
+    body: commands,
   })
   .then((data) =>
     console.log(`Successfully registered ${data.length} application commands.`)
