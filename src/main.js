@@ -44,7 +44,9 @@ client.on("messageCreate", async (msg) => {
     console.log(dataToSend);
     sendBombMsgToDB(dataToSend, msg.author.username);
 
-    msg.reply("nice");
+    if (!dataToSend.isFourTwenty) {
+      msg.reply("Oop");
+    }
   }
 });
 
