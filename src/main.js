@@ -4,7 +4,11 @@ const botId = process.env.BOT_TOKEN;
 
 const { Client, IntentsBitField } = require("discord.js");
 const { emotes, includesBomb } = require("./emotes-utils");
-const { sendData, sendBombMsgToDB } = require("./firebase-utils");
+const {
+  sendData,
+  sendBombMsgToDB,
+  getBombMsgsFromDB,
+} = require("./firebase-utils");
 const { isFourTwenty, getNiceTime, getNiceDate } = require("./time-utils");
 
 const intents = new IntentsBitField();
@@ -24,16 +28,18 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async (msg) => {
-  // console.log("emotes: ", emotes(msg.content));
-
+  // const differentDay = new Date("30 September 2022 07:35");
   if (includesBomb(msg.content)) {
     const dataToSend = {
       discordTimestamp: msg.createdTimestamp,
       author: msg.author.username,
       content: msg.content,
       niceDate: getNiceDate(msg.createdTimestamp),
+      // niceDate: getNiceDate(differentDay),
+      // niceTime: getNiceTime(differentDay),
       niceTime: getNiceTime(msg.createdTimestamp),
       isFourTwenty: isFourTwenty(msg.createdTimestamp),
+      // isFourTwenty: true,
     };
     console.log(dataToSend);
     sendBombMsgToDB(dataToSend, msg.author.username);
@@ -47,16 +53,31 @@ client.on("interactionCreate", async (interaction) => {
 
   const { user } = interaction;
 
-  console.log(interaction);
+  if (interaction.commandName === "bombstats") {
+    const userBombMessages = await getBombMsgsFromDB(user.username);
+    const is420Messages = userBombMessages.filter((msg) => msg.isFourTwenty);
+    const accuracyFraction = `${is420Messages.length}/${userBombMessages.length}`;
+    const accuracyPercent =
+      (is420Messages.length / userBombMessages.length) * 100;
 
-  if (interaction.commandName === "user") {
-    interaction.reply(
-      `Your user name is ${user.username}, and your ID is ${user.id}`
-    );
-  }
-
-  if ((interaction.commandName = "mybombstats")) {
-    interaction.reply("NAILED IT");
+    if (interaction.options.getSubcommand() === "total") {
+      console.log("total");
+      interaction.reply(
+        `You have sent ${userBombMessages.length} bomb messages`
+      );
+    }
+    if (interaction.options.getSubcommand() === "accuracy") {
+      console.log("accuracy");
+      interaction.reply(
+        `You have an accuracy of ${accuracyFraction} or ${accuracyPercent}%`
+      );
+    }
+    if (interaction.options.getSubcommand() === "all") {
+      console.log("all");
+      interaction.reply(
+        `You have sent ${userBombMessages.length} bomb messages, with an accuracy of ${accuracyPercent}%`
+      );
+    }
   }
 });
 

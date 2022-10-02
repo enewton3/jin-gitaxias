@@ -1,5 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const { getDatabase, ref, set, get } = require("firebase/database");
+const { getDatabase, ref, set, get, child } = require("firebase/database");
 const { getNiceDate } = require("./time-utils");
 
 require("dotenv").config();
@@ -22,7 +22,7 @@ const sendBombMsgToDB = (payload, username) => {
     set(
       ref(
         db,
-        `/bombMessages/${username}/${getNiceDate(payload.discordTimestamp)}`
+        `/bombMessages/${username}/${payload.niceDate} ${payload.niceTime}`
       ),
       payload
     );
@@ -32,9 +32,11 @@ const sendBombMsgToDB = (payload, username) => {
 };
 
 const getBombMsgsFromDB = async (username) => {
+  const dbRef = ref(db);
   try {
-    const resp = await get(ref(db, `/bombMessages/${username}`));
-    return resp;
+    const resp = await get(child(dbRef, `/bombMessages/${username}`));
+    if (!resp.val()) return;
+    return Object.values(resp.val());
   } catch (e) {
     console.log(e);
   }
