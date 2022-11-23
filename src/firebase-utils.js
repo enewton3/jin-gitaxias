@@ -1,6 +1,5 @@
 const { initializeApp } = require("firebase/app");
 const { getDatabase, ref, set, get, child } = require("firebase/database");
-const { getNiceDate } = require("./time-utils");
 
 require("dotenv").config();
 

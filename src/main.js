@@ -9,7 +9,12 @@ const {
   sendBombMsgToDB,
   getBombMsgsFromDB,
 } = require("./firebase-utils");
-const { isFourTwenty, getNiceTime, getNiceDate } = require("./time-utils");
+const {
+  isFourTwenty,
+  getNiceTime,
+  getNiceDate,
+  timeSinceFourTwenty,
+} = require("./time-utils");
 
 const intents = new IntentsBitField();
 
@@ -18,7 +23,6 @@ intents.add(
   IntentsBitField.Flags.Guilds,
   IntentsBitField.Flags.GuildEmojisAndStickers,
   IntentsBitField.Flags.MessageContent
-  // IntentsBitField.Flags.GuildMembers
 );
 
 const client = new Client({ intents: intents });
@@ -28,24 +32,33 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async (msg) => {
-  // const differentDay = new Date("30 September 2022 07:35");
   if (includesBomb(msg.content)) {
+    const msgCreatedDateTime = new Date(msg.createdTimestamp);
     const dataToSend = {
       discordTimestamp: msg.createdTimestamp,
       author: msg.author.username,
       content: msg.content,
       niceDate: getNiceDate(msg.createdTimestamp),
-      // niceDate: getNiceDate(differentDay),
-      // niceTime: getNiceTime(differentDay),
       niceTime: getNiceTime(msg.createdTimestamp),
       isFourTwenty: isFourTwenty(msg.createdTimestamp),
-      // isFourTwenty: true,
     };
     console.log(dataToSend);
     sendBombMsgToDB(dataToSend, msg.author.username);
 
     if (!dataToSend.isFourTwenty) {
-      msg.reply("Oop");
+      const timeSince = timeSinceFourTwenty(msgCreatedDateTime);
+
+      let replyString = [];
+      if (timeSince.hours > 0) replyString.push(`${timeSince.hours} hours`);
+      if (timeSince.minutes > 0)
+        replyString.push(`${timeSince.minutes} minutes`);
+      if (timeSince.seconds > 0)
+        replyString.push(`${timeSince.seconds} seconds`);
+      if (timeSince.millis > 0)
+        replyString.push(`${timeSince.millis} milliseconds`);
+
+      msg.react("🪦");
+      msg.reply(`Oop, You were ${replyString.join(", ")} late`);
     }
   }
 });
@@ -54,6 +67,10 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   const { user } = interaction;
+
+  if (interaction.commandName === "slinnvodascore") {
+    
+  }
 
   if (interaction.commandName === "bombstats") {
     const userBombMessages = await getBombMsgsFromDB(user.username);
