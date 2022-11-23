@@ -77,10 +77,23 @@ const bombComboToDB = async () => {
   }
 };
 
+const getComboNumberFromDB = async () => {
+  const dbRef = ref(db);
+  const today = getNiceDate(Date.now());
+  try {
+    const resp = await get(child(dbRef, `/bombMessages/comboCount/${today}`));
+    if (!resp.val()) return 0;
+    return resp.val();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 module.exports = {
   sendBombMsgToDB,
   getBombMsgsFromDB,
   addToSlinnVodaScore,
   getSlinnVodaScore,
   bombComboToDB,
+  getComboNumberFromDB,
 };

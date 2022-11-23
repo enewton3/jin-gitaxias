@@ -5,11 +5,13 @@
   "main": "source.js",
   "author": "Evyn Newton",
   "dependencies": {
+    "cron": "^2.1.0",
     "discord.js": "^14.4.0",
     "dotenv": "^16.0.2",
     "firebase": "^9.10.0"
   },
   "scripts": {
-    "start": "node src/main.js"
+    "start": "node src/main.js",
+    "deploy": "node src/deploy-commands.js"
   }
 }
