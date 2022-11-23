@@ -31,12 +31,11 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
-let primaryChannel;
-
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  const testingGuild = await client.guilds.fetch("1022967209154330735");
-  primaryChannel = await testingGuild.channels.fetch("1022967209154330738");
+  const primaryChannel = await testingGuild.channels.fetch(
+    `${process.env.TESTING_CHANNEL_ID}`
+  );
   console.log(primaryChannel);
 
   const comboJob = new cron.CronJob(
