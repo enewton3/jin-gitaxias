@@ -33,6 +33,9 @@ const client = new Client({
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  const testingGuild = await client.guilds.fetch(
+    `${process.env.TESTING_SERVER_ID}`
+  );
   const primaryChannel = await testingGuild.channels.fetch(
     `${process.env.TESTING_CHANNEL_ID}`
   );
