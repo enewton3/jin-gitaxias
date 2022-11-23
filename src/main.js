@@ -39,7 +39,6 @@ client.on("ready", async () => {
   const primaryChannel = await testingGuild.channels.fetch(
     `${process.env.TESTING_CHANNEL_ID}`
   );
-  console.log(primaryChannel);
 
   const comboJob = new cron.CronJob(
     "22 16 * * *",
