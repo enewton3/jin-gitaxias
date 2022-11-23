@@ -1,4 +1,6 @@
-const trackedEmotes = [
+const { MessageReaction } = require("discord.js");
+
+const bombEmotes = [
   ":bomb:",
   ":bombisland:",
   ":massbomb:",
@@ -15,7 +17,7 @@ const emotes = (str) =>
   str.match(/<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu);
 
 const includesBomb = (msg) => {
-  const included = trackedEmotes.filter((emote) =>
+  const included = bombEmotes.filter((emote) =>
     msg.includes(emote) ? emote : null
   );
   if (included.length > 0) {
@@ -24,7 +26,12 @@ const includesBomb = (msg) => {
   return false;
 };
 
+const isSlinnVoda = (reaction) => {
+  return reaction === "slinnvodapoint";
+};
+
 module.exports = {
   emotes,
   includesBomb,
+  isSlinnVoda,
 };

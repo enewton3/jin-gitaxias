@@ -29,9 +29,23 @@ const commands = [
         .setName("all")
         .setDescription("All of your stats collated nicely for you")
     ),
+  new SlashCommandBuilder()
+    .setName("slinnvodascore")
+    .setDescription("Get your Slinn Voda Score!"),
+  new SlashCommandBuilder()
+    .setName("itstimetoduel")
+    .setDescription("Start a poll GIF to schedule a game night!"),
+  new SlashCommandBuilder()
+    .setName("bombmessagesscrape")
+    .setDescription("Scrape for old bomb messages. Only run once by ADMIN"),
+  new SlashCommandBuilder()
+    .setName("slinnvodascrape")
+    .setDescription(
+      "Scrape for slinn voda point reacts. Only run once by ADMIN"
+    ),
 ].map((command) => command.toJSON());
 
-// const emptyCommands = [];
+const emptyCommands = [];
 
 const rest = new REST({ version: "10" }).setToken(botId);
 

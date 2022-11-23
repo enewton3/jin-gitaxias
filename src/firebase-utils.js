@@ -1,5 +1,13 @@
 const { initializeApp } = require("firebase/app");
-const { getDatabase, ref, set, get, child } = require("firebase/database");
+const {
+  getDatabase,
+  ref,
+  set,
+  get,
+  child,
+  increment,
+} = require("firebase/database");
+const { getNiceDate } = require("./time-utils");
 
 require("dotenv").config();
 
@@ -41,4 +49,38 @@ const getBombMsgsFromDB = async (username) => {
   }
 };
 
-module.exports = { sendBombMsgToDB, getBombMsgsFromDB };
+const addToSlinnVodaScore = (username) => {
+  try {
+    set(ref(db, `/slinnvodascores/${username}`), increment(1));
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const getSlinnVodaScore = async (username) => {
+  const dbRef = ref(db);
+  try {
+    const resp = await get(child(dbRef, `/slinnvodascores/${username}`));
+    if (!resp.val()) return 0;
+    return resp.val();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const bombComboToDB = async () => {
+  const today = getNiceDate(Date.now());
+  try {
+    set(ref(db, `/bombMessages/comboCount/${today}`), increment(1));
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+module.exports = {
+  sendBombMsgToDB,
+  getBombMsgsFromDB,
+  addToSlinnVodaScore,
+  getSlinnVodaScore,
+  bombComboToDB,
+};

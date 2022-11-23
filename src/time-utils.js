@@ -20,7 +20,10 @@ const getNiceTime = (timestamp) => {
   return date.toLocaleTimeString();
 };
 
-/// check to see how many seconds since or until fourTwenty
+/**check to see how long since or until fourTwenty
+ * @param {number} Date to check against
+ * @return {string} a nicely formatted string of hours, minutes, seconds, millis
+ */
 const timeSinceFourTwenty = (currentTime) => {
   const currentTimeDateTime = new Date(currentTime);
   const todayDate = currentTimeDateTime.getDate();
@@ -36,14 +39,21 @@ const timeSinceFourTwenty = (currentTime) => {
   );
 
   const millisSince = new Date(currentTimeDateTime - fourTwentyToday);
-  const returnObj = {
+  const timeSince = {
     hours: millisSince.getUTCHours(),
     minutes: millisSince.getUTCMinutes(),
     seconds: millisSince.getUTCSeconds(),
     millis: millisSince.getUTCMilliseconds(),
   };
 
-  return returnObj;
+  let replyString = [];
+  if (timeSince.hours > 0) replyString.push(`${timeSince.hours} hours`);
+  if (timeSince.minutes > 0) replyString.push(`${timeSince.minutes} minutes`);
+  if (timeSince.seconds > 0) replyString.push(`${timeSince.seconds} seconds`);
+  if (timeSince.millis > 0)
+    replyString.push(`${timeSince.millis} milliseconds`);
+
+  return replyString.join(", ");
 };
 
 module.exports = {
