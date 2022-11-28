@@ -105,7 +105,7 @@ const getComboNumberFromDB = async (dateInTimezone) => {
       child(
         dbRef,
         `/comboCount/${process.env.SERVER_ID}/${
-          dateInTimezone.zone
+          dateInTimezone.zoneName
         }/${dateInTimezone.toLocaleString(
           DateTime.DATE_SHORT
         )}/${dateInTimezone.toFormat("a")}`
