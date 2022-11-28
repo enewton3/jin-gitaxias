@@ -1,29 +1,21 @@
 const { sendBombMsgToDB, bombComboToDB } = require("./firebase-utils");
-const {
-  timeSinceFourTwenty,
-  getNiceDate,
-  getNiceTime,
-  isFourTwenty,
-} = require("./time-utils");
+const { timeSinceFourTwenty, isFourTwenty } = require("./time-utils");
 
 const handleBombMessage = (msg) => {
   const msgCreatedDateTime = new Date(msg.createdTimestamp);
   const dataToSend = {
     discordTimestamp: msg.createdTimestamp,
-    author: msg.author.username,
+    authorId: msg.author.id,
     content: msg.content,
-    niceDate: getNiceDate(msg.createdTimestamp),
-    niceTime: getNiceTime(msg.createdTimestamp),
-    isFourTwenty: isFourTwenty(msg.createdTimestamp),
+    messageId: msg.id,
+    channelId: msg.channelId,
   };
   console.log(dataToSend);
-  sendBombMsgToDB(dataToSend, msg.author.username);
+  sendBombMsgToDB(dataToSend);
 
-  if (dataToSend.isFourTwenty) {
+  if (isFourTwenty(dataToSend.discordTimestamp)) {
     bombComboToDB();
-  }
-
-  if (!dataToSend.isFourTwenty) {
+  } else {
     msg.react("🪦");
     msg.reply(`Oop, You were ${timeSinceFourTwenty(msgCreatedDateTime)} late`);
   }

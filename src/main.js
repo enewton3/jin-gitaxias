@@ -51,7 +51,7 @@ client.on("ready", async () => {
 });
 
 client.on("messageCreate", (msg) => {
-  // console.log(JSON.stringify(msg, null, 4));
+  console.log(JSON.stringify(msg, null, 4));
   if (includesBomb(msg.content) && msg.channelId === process.env.CHANNEL_ID) {
     handleBombMessage(msg);
   }
@@ -68,33 +68,31 @@ client.on("messageReactionAdd", async (reaction, user) => {
   }
 
   if (isSlinnVoda(reaction.emoji.name)) {
-    addToSlinnVodaScore(user.username);
+    addToSlinnVodaScore(reaction.message.author.id);
   }
 });
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  const { user } = interaction;
-
   if (interaction.commandName === "slinnvodascore") {
-    await handleSlinnVodaScoreInteraction(interaction, user);
+    await handleSlinnVodaScoreInteraction(interaction);
   }
 
   if (interaction.commandName === "bombstats") {
-    await handleBombStatsInteraction(interaction, user);
+    await handleBombStatsInteraction(interaction);
   }
 
   if (interaction.commandName === "itstimetoduel") {
-    await handleSchedulingInteraction(interaction, user);
+    await handleSchedulingInteraction(interaction);
   }
 
   if (interaction.commandName === "bombmessagesscrape") {
-    await handleBombMessageScrapeInteraction(interaction, user);
+    await handleBombMessageScrapeInteraction(interaction);
   }
 
   if (interaction.commandName === "slinnvodascrape") {
-    await handleSlinnVodaScoreScrapeInteraction(interaction, user);
+    await handleSlinnVodaScoreScrapeInteraction(interaction);
   }
 });
 
