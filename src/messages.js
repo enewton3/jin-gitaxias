@@ -13,7 +13,7 @@ const handleBombMessage = (msg, timezone) => {
   sendBombMsgToDB(dataToSend);
 
   if (isFourTwenty(msg.createdTimestamp, timezone)) {
-    bombComboToDB();
+    bombComboToDB(msg.createdTimestamp, timezone);
   } else {
     msg.react("🪦");
 

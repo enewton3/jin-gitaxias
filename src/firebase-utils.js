@@ -7,7 +7,8 @@ const {
   child,
   increment,
 } = require("firebase/database");
-const { getNiceDate } = require("./time-utils");
+const { DateTime } = require("luxon");
+const { getNiceDate, getAMorPM } = require("./time-utils");
 
 require("dotenv").config();
 
@@ -75,21 +76,40 @@ const getSlinnVodaScore = async (userId) => {
   }
 };
 
-const bombComboToDB = async () => {
-  const today = getNiceDate(Date.now());
+const bombComboToDB = async (msgTimestamp, timezone) => {
+  const nowDate = DateTime.fromMillis(timestamp, {
+    zone: timezone,
+  });
   try {
-    set(ref(db, `/comboCount/${process.env.SERVER_ID}/${today}`), increment(1));
+    set(
+      ref(
+        db,
+        `/comboCount/${
+          process.env.SERVER_ID
+        }/${timezone}/${nowDate.toLocaleString(
+          DateTime.DATE_SHORT
+        )}/${nowDate.toFormat("a")}`
+      ),
+      increment(1)
+    );
   } catch (e) {
     console.log(e);
   }
 };
 
-const getComboNumberFromDB = async () => {
+const getComboNumberFromDB = async (dateInTimezone) => {
   const dbRef = ref(db);
-  const today = getNiceDate(Date.now());
+
   try {
     const resp = await get(
-      child(dbRef, `/comboCount/${process.env.SERVER_ID}/${today}`)
+      child(
+        dbRef,
+        `/comboCount/${process.env.SERVER_ID}/${
+          dateInTimezone.zone
+        }/${dateInTimezone.toLocaleString(
+          DateTime.DATE_SHORT
+        )}/${dateInTimezone.toFormat("a")}`
+      )
     );
     if (!resp.val()) return 0;
     return resp.val();

@@ -19,6 +19,14 @@ const getNiceTime = (timestamp) => {
   return date.toLocaleTimeString();
 };
 
+const getAMorPM = (timestamp, timezone) => {
+  const nowDate = DateTime.fromMillis(timestamp, {
+    zone: timezone,
+  });
+
+  return nowDate.toFormat("a");
+};
+
 /**check to see how long since or until fourTwenty
  * @param {number} Date to check against
  * @return {string} a nicely formatted string of hours, minutes, seconds, millis
@@ -90,4 +98,5 @@ module.exports = {
   getNiceDate,
   getNiceTime,
   calculateFourTwentyProximity,
+  getAMorPM,
 };

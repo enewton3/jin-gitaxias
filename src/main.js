@@ -37,12 +37,12 @@ client.on("ready", async () => {
   const channel = await guild.channels.fetch(`${process.env.CHANNEL_ID}`);
 
   const comboJob = new cron.CronJob(
-    "22 16 * * *",
+    "22 * * * *",
     () => handleComboJob(channel),
-    () => console.log("Combo job ran at 16:22"),
+    () => console.log("Combo job ran"),
     true,
-    "UTC-5",
-    false,
+    undefined,
+    undefined,
     true
   );
 
