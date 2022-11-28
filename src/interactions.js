@@ -1,8 +1,11 @@
 const { getBombMsgsFromDB, getSlinnVodaScore } = require("./firebase-utils");
+const { isFourTwenty } = require("./time-utils");
 
-const handleBombStatsInteraction = async (interaction, user) => {
-  const userBombMessages = await getBombMsgsFromDB(user.username);
-  const is420Messages = userBombMessages.filter((msg) => msg.isFourTwenty);
+const handleBombStatsInteraction = async (interaction) => {
+  const userBombMessages = await getBombMsgsFromDB(interaction.user.id);
+  const is420Messages = userBombMessages.filter((msg) =>
+    isFourTwenty(msg.discordTimestamp)
+  );
   const accuracyFraction = `${is420Messages.length}/${userBombMessages.length}`;
   const accuracyPercent =
     (is420Messages.length / userBombMessages.length) * 100;
@@ -22,20 +25,20 @@ const handleBombStatsInteraction = async (interaction, user) => {
   }
 };
 
-const handleSlinnVodaScoreInteraction = async (interaction, user) => {
-  const userSlinnVodaScore = await getSlinnVodaScore(user.username);
+const handleSlinnVodaScoreInteraction = async (interaction) => {
+  const userSlinnVodaScore = await getSlinnVodaScore(interaction.user.id);
   interaction.reply(`Your Slinn Voda Score is ${userSlinnVodaScore}`);
 };
 
-const handleSchedulingInteraction = (interaction, user) => {
+const handleSchedulingInteraction = (interaction) => {
   interaction.reply("Scheduling will happen here eventually");
 };
 
-const handleBombMessageScrapeInteraction = (interaction, user) => {
+const handleBombMessageScrapeInteraction = (interaction) => {
   interaction.reply("Will be supported eventually");
 };
 
-const handleSlinnVodaScoreScrapeInteraction = (interaction, user) => {
+const handleSlinnVodaScoreScrapeInteraction = (interaction) => {
   interaction.reply("This will be supported soon");
 };
 

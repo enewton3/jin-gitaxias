@@ -24,12 +24,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const sendBombMsgToDB = (payload, username) => {
+const sendBombMsgToDB = (payload) => {
   try {
     set(
       ref(
         db,
-        `/bombMessages/${username}/${payload.niceDate} ${payload.niceTime}`
+        `/bombMessages/${process.env.SERVER_ID}/${payload.authorId}/${payload.messageId}`
       ),
       payload
     );
@@ -38,10 +38,12 @@ const sendBombMsgToDB = (payload, username) => {
   }
 };
 
-const getBombMsgsFromDB = async (username) => {
+const getBombMsgsFromDB = async (userId) => {
   const dbRef = ref(db);
   try {
-    const resp = await get(child(dbRef, `/bombMessages/${username}`));
+    const resp = await get(
+      child(dbRef, `/bombMessages/${process.env.SERVER_ID}/${userId}`)
+    );
     if (!resp.val()) return;
     return Object.values(resp.val());
   } catch (e) {
@@ -49,18 +51,23 @@ const getBombMsgsFromDB = async (username) => {
   }
 };
 
-const addToSlinnVodaScore = (username) => {
+const addToSlinnVodaScore = (userId) => {
   try {
-    set(ref(db, `/slinnvodascores/${username}`), increment(1));
+    set(
+      ref(db, `/slinnvodascores/${process.env.SERVER_ID}/${userId}`),
+      increment(1)
+    );
   } catch (e) {
     console.log(e);
   }
 };
 
-const getSlinnVodaScore = async (username) => {
+const getSlinnVodaScore = async (userId) => {
   const dbRef = ref(db);
   try {
-    const resp = await get(child(dbRef, `/slinnvodascores/${username}`));
+    const resp = await get(
+      child(dbRef, `/slinnvodascores/${process.env.SERVER_ID}/${userId}`)
+    );
     if (!resp.val()) return 0;
     return resp.val();
   } catch (e) {
@@ -71,7 +78,7 @@ const getSlinnVodaScore = async (username) => {
 const bombComboToDB = async () => {
   const today = getNiceDate(Date.now());
   try {
-    set(ref(db, `/bombMessages/comboCount/${today}`), increment(1));
+    set(ref(db, `/comboCount/${process.env.SERVER_ID}/${today}`), increment(1));
   } catch (e) {
     console.log(e);
   }
@@ -81,7 +88,9 @@ const getComboNumberFromDB = async () => {
   const dbRef = ref(db);
   const today = getNiceDate(Date.now());
   try {
-    const resp = await get(child(dbRef, `/bombMessages/comboCount/${today}`));
+    const resp = await get(
+      child(dbRef, `/comboCount/${process.env.SERVER_ID}/${today}`)
+    );
     if (!resp.val()) return 0;
     return resp.val();
   } catch (e) {
