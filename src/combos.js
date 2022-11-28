@@ -15,10 +15,13 @@ const handleComboJob = async (channel) => {
     }
   }
 
-  const todaysCombo = await getComboNumberFromDB(dateInFourTwentyTimezone);
-  if (todaysCombo < 2) return;
+  if (!dateInFourTwentyTimezone) return;
 
-  channel.send(`${todaysCombo}X COMBO!!!`);
+  const todaysCombo = await getComboNumberFromDB(dateInFourTwentyTimezone);
+
+  if (todaysCombo >= 2) {
+    channel.send(`${todaysCombo}X COMBO!!!`);
+  }
 };
 
 module.exports = { handleComboJob };
