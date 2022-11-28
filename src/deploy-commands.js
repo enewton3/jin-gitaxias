@@ -6,9 +6,9 @@ const {
   Routes,
   SlashCommandSubcommandBuilder,
 } = require("discord.js");
-const clientId = process.env.CLIENT_ID;
-const guildId = process.env.SERVER_TOKEN;
-const botId = process.env.BOT_TOKEN;
+const clientId = process.env.BOT_CLIENT_ID;
+const guildId = process.env.SERVER_ID;
+const botToken = process.env.BOT_TOKEN;
 
 const commands = [
   new SlashCommandBuilder()
@@ -35,19 +35,11 @@ const commands = [
   new SlashCommandBuilder()
     .setName("itstimetoduel")
     .setDescription("Start a poll GIF to schedule a game night!"),
-  new SlashCommandBuilder()
-    .setName("bombmessagesscrape")
-    .setDescription("Scrape for old bomb messages. Only run once by ADMIN"),
-  new SlashCommandBuilder()
-    .setName("slinnvodascrape")
-    .setDescription(
-      "Scrape for slinn voda point reacts. Only run once by ADMIN"
-    ),
 ].map((command) => command.toJSON());
 
 const emptyCommands = [];
 
-const rest = new REST({ version: "10" }).setToken(botId);
+const rest = new REST({ version: "10" }).setToken(botToken);
 
 rest
   .put(Routes.applicationGuildCommands(clientId, guildId), {
