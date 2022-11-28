@@ -1,4 +1,5 @@
 require("dotenv").config();
+console.log(process.env);
 const cron = require("cron");
 
 const botId = process.env.BOT_TOKEN;
@@ -31,12 +32,13 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
+let primaryChannel;
+let primaryGuild;
+
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  const testingGuild = await client.guilds.fetch(
-    `${process.env.TESTING_SERVER_ID}`
-  );
-  const primaryChannel = await testingGuild.channels.fetch(
+  primaryGuild = await client.guilds.fetch(`${process.env.TESTING_SERVER_ID}`);
+  primaryChannel = await primaryGuild.channels.fetch(
     `${process.env.TESTING_CHANNEL_ID}`
   );
 

@@ -2,7 +2,7 @@
   "name": "jin-gitaxias",
   "version": "1.0.0",
   "description": "A discord bot",
-  "main": "source.js",
+  "main": "main.js",
   "author": "Evyn Newton",
   "dependencies": {
     "cron": "^2.1.0",
