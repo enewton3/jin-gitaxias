@@ -40,9 +40,6 @@ client.on("ready", async () => {
     "22 * * * *",
     () => handleComboJob(channel),
     () => console.log("Combo job ran"),
-    true,
-    undefined,
-    undefined,
     true
   );
 
