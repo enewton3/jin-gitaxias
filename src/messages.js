@@ -23,8 +23,8 @@ const handleBombMessage = (msg, timezone) => {
     );
 
     msg.reply(
-      `Oop, You were  ${diff.toFormat(
-        "h 'hours,' m 'minutes,' s 'seconds, and' S 'milliseconds'"
+      `Oop, You were \n ${diff.toFormat(
+        "h 'hours,\n' m 'minutes,\n' s 'seconds,\n and' S 'milliseconds\n'"
       )} ${after ? "LATE :cold_face:" : "EARLY :hot_face:"}`
     );
   }
