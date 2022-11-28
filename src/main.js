@@ -33,16 +33,12 @@ const client = new Client({
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  const testingGuild = await client.guilds.fetch(
-    `${process.env.TESTING_SERVER_ID}`
-  );
-  const primaryChannel = await testingGuild.channels.fetch(
-    `${process.env.TESTING_CHANNEL_ID}`
-  );
+  const guild = await client.guilds.fetch(`${process.env.SERVER_ID}`);
+  const channel = await guild.channels.fetch(`${process.env.CHANNEL_ID}`);
 
   const comboJob = new cron.CronJob(
     "22 16 * * *",
-    () => handleComboJob(primaryChannel),
+    () => handleComboJob(channel),
     () => console.log("Combo job ran at 16:22"),
     true,
     "UTC-5",
@@ -54,7 +50,8 @@ client.on("ready", async () => {
 });
 
 client.on("messageCreate", (msg) => {
-  if (includesBomb(msg.content)) {
+  // console.log(JSON.stringify(msg, null, 4));
+  if (includesBomb(msg.content) && msg.channelId === process.env.CHANNEL_ID) {
     handleBombMessage(msg);
   }
 });
