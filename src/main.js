@@ -1,5 +1,4 @@
 require("dotenv").config();
-console.log(process.env);
 const cron = require("cron");
 
 const botId = process.env.BOT_TOKEN;
@@ -12,7 +11,7 @@ const {
   handleSchedulingInteraction,
   handleSlinnVodaScoreScrapeInteraction,
 } = require("./interactions");
-const { includesBomb, isSlinnVoda } = require("./emotes-utils");
+const { getBombMatches, isSlinnVoda } = require("./emotes-utils");
 const { addToSlinnVodaScore } = require("./firebase-utils");
 const { handleBombMessage } = require("./messages");
 const { handleComboJob } = require("./combos");
@@ -51,9 +50,16 @@ client.on("ready", async () => {
 });
 
 client.on("messageCreate", (msg) => {
-  console.log(JSON.stringify(msg, null, 4));
-  if (includesBomb(msg.content) && msg.channelId === process.env.CHANNEL_ID) {
-    handleBombMessage(msg);
+  if (msg.channelId !== process.env.CHANNEL_ID) return;
+
+  const matches = getBombMatches(msg.content);
+
+  const timezones = new Set(matches.map(([, timezone]) => timezone));
+
+  if (timezones.size > 1) {
+    console.log("TOO MANY TUNAS");
+  } else if (timezones.size === 1) {
+    handleBombMessage(msg, matches[0][1]);
   }
 });
 

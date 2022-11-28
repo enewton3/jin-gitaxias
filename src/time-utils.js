@@ -1,10 +1,9 @@
-const isFourTwenty = (timestamp) => {
-  const date = new Date(timestamp);
+const { DateTime } = require("luxon");
 
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+const isFourTwenty = (timestamp, timezone) => {
+  const date = DateTime.fromMillis(timestamp, { zone: timezone });
 
-  if (hours === 16 && minutes === 20) {
+  if ((date.hour === 16 || date.hour === 4) && date.minute === 20) {
     return true;
   }
   return false;
@@ -24,41 +23,71 @@ const getNiceTime = (timestamp) => {
  * @param {number} Date to check against
  * @return {string} a nicely formatted string of hours, minutes, seconds, millis
  */
-const timeSinceFourTwenty = (currentTime) => {
-  const currentTimeDateTime = new Date(currentTime);
-  const todayDate = currentTimeDateTime.getDate();
-  const todayMonth = currentTimeDateTime.getMonth();
-  const todayYear = currentTimeDateTime.getFullYear();
+const calculateFourTwentyProximity = (msgCreatedTimestamp, bombTimezone) => {
+  const nowDate = DateTime.fromMillis(msgCreatedTimestamp, {
+    zone: bombTimezone,
+  });
 
-  const fourTwentyToday = new Date(
-    todayYear,
-    todayMonth,
-    todayDate,
-    "16",
-    "20"
-  );
+  const tenTwentyPM = nowDate.set({
+    hour: 22,
+    minute: 20,
+    second: 0,
+    millisecond: 0,
+  });
 
-  const millisSince = new Date(currentTimeDateTime - fourTwentyToday);
-  const timeSince = {
-    hours: millisSince.getUTCHours(),
-    minutes: millisSince.getUTCMinutes(),
-    seconds: millisSince.getUTCSeconds(),
-    millis: millisSince.getUTCMilliseconds(),
-  };
+  if (nowDate > tenTwentyPM) {
+    //early for the next day
+    const nextDayFourTwentyAM = nowDate
+      .plus({ days: 1 })
+      .set({ hour: 4, minute: 20 });
+    const diff = nextDayFourTwentyAM.diff(nowDate);
 
-  let replyString = [];
-  if (timeSince.hours > 0) replyString.push(`${timeSince.hours} hours`);
-  if (timeSince.minutes > 0) replyString.push(`${timeSince.minutes} minutes`);
-  if (timeSince.seconds > 0) replyString.push(`${timeSince.seconds} seconds`);
-  if (timeSince.millis > 0)
-    replyString.push(`${timeSince.millis} milliseconds`);
+    return { diff, after: false };
+  }
 
-  return replyString.join(", ");
+  const fourTwentyPM = nowDate.set({
+    hour: 16,
+    minute: 20,
+    second: 0,
+    millisecond: 0,
+  });
+  if (nowDate > fourTwentyPM) {
+    //late for 16:20 today
+    const diff = nowDate.diff(fourTwentyPM);
+    return { diff, after: true };
+  }
+
+  const tenTwentyAM = nowDate.set({
+    hour: 10,
+    minute: 20,
+    second: 0,
+    millisecond: 0,
+  });
+  if (nowDate > tenTwentyAM) {
+    //early for 16:20 today
+    const diff = fourTwentyPM.diff(nowDate);
+    return { diff, after: false };
+  }
+
+  const fourTwentyAM = nowDate.set({
+    hour: 4,
+    minute: 20,
+    second: 0,
+    millisecond: 0,
+  });
+  if (nowDate > fourTwentyAM) {
+    //late for 04:20 today
+    const diff = nowDate.diff(fourTwentyAM);
+    return { diff, after: true };
+  }
+
+  const diff = fourTwentyAM.diff(nowDate);
+  return { diff, after: false };
 };
 
 module.exports = {
   isFourTwenty,
   getNiceDate,
   getNiceTime,
-  timeSinceFourTwenty,
+  calculateFourTwentyProximity,
 };
