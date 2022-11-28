@@ -70,7 +70,10 @@ client.on("messageReactionAdd", async (reaction, user) => {
     }
   }
 
-  if (isSlinnVoda(reaction.emoji.name)) {
+  if (
+    isSlinnVoda(reaction.emoji.name) &&
+    user.id !== reaction.message.author.id
+  ) {
     addToSlinnVodaScore(reaction.message.author.id);
   }
 });
