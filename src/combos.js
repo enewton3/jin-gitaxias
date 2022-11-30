@@ -31,7 +31,7 @@ const handleComboJob = async (channel) => {
 
     channel.send(
       `${numbersTM[size(todaysCombo)]} ❎
-    \n🇨 🇨 🇨 🇨🅾️Ⓜ️🅱️🇴:grey_exclamation::grey_exclamation: 
+    \n:arrow_right_hook:🅾️Ⓜ️🅱️🇴:grey_exclamation::grey_exclamation: 
     `
     );
     channel.send(`${todaysComboEmojis.join(" ")}`);

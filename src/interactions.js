@@ -1,15 +1,17 @@
+const { getBombMatches, getTimezoneForEmoji } = require("./emotes-utils");
 const { getBombMsgsFromDB, getSlinnVodaScore } = require("./firebase-utils");
 const Imgflip = require("./imgflip").default;
 const { isFourTwenty } = require("./time-utils");
 
 const handleBombStatsInteraction = async (interaction) => {
   const userBombMessages = await getBombMsgsFromDB(interaction.user.id);
-  const is420Messages = userBombMessages.filter((msg) =>
-    isFourTwenty(msg.discordTimestamp)
-  );
-  const accuracyFraction = `${is420Messages.length}/${userBombMessages.length}`;
-  const accuracyPercent =
-    (is420Messages.length / userBombMessages.length) * 100;
+  const is420Messages = userBombMessages.filter((msg) => {
+    const msgTimezone = getTimezoneForEmoji(getBombMatches(msg.content)[0]);
+    return isFourTwenty(msg.discordTimestamp, msgTimezone);
+  });
+
+  const accuracyFraction = is420Messages.length / userBombMessages.length;
+  const accuracyPercent = parseFloat(accuracyFraction.toFixed(5)) * 100;
 
   if (interaction.options.getSubcommand() === "total") {
     interaction.reply(`You have sent ${userBombMessages.length} bomb messages`);
