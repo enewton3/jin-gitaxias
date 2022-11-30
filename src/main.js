@@ -15,6 +15,7 @@ const { getBombMatches, isSlinnVoda } = require("./emotes-utils");
 const { addToSlinnVodaScore } = require("./firebase-utils");
 const { handleBombMessage } = require("./messages");
 const { handleComboJob } = require("./combos");
+const isProduction = require("./env-utils");
 
 const intents = new IntentsBitField();
 
@@ -35,7 +36,7 @@ client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
   const guild = await client.guilds.fetch(`${process.env.SERVER_ID}`);
   const channel = await guild.channels.fetch(`${process.env.CHANNEL_ID}`);
-
+  console.log(process.env.NODE_ENV);
   const comboJob = new cron.CronJob(
     "22 * * * *",
     () => handleComboJob(channel),
@@ -80,7 +81,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-  if (interaction.guild === "") return;
+  if (!isProduction()) return;
 
   if (interaction.commandName === "slinnvodascore") {
     await handleSlinnVodaScoreInteraction(interaction);
