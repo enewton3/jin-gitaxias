@@ -96,10 +96,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
   if (!isActiveServer(interaction.guildId)) return;
-  if (!isProduction() && !isTESTChannel(interaction.channelId)) {
-    interaction.reply("Please try again in your own testing channel <3");
-    return;
-  }
+  if (!isProduction() && !isTESTChannel(interaction.channelId)) return;
 
   if (interaction.commandName === "slinnvodascore") {
     await handleSlinnVodaScoreInteraction(interaction);

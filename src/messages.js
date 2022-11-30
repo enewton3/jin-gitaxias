@@ -93,4 +93,4 @@ const handleBombMessage = async (msg, timezone, emoji) => {
   }
 };
 
-module.exports = { handleBombMessage };
+module.exports = { handleBombMessage, numbersTM };
