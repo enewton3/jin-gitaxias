@@ -7,6 +7,7 @@ const {
   child,
   increment,
 } = require("firebase/database");
+const { size, has } = require("lodash");
 const { DateTime } = require("luxon");
 
 require("dotenv").config();
@@ -27,14 +28,24 @@ const db = getDatabase(app);
 const makePathMaker = (sliceName) => (subPath) =>
   `/${process.env.SERVER_ID}/${sliceName}/${subPath}`;
 
-const messagesPath = makePathMaker("bombMessages");
-const slinnVodaPath = makePathMaker("slinnVodaScores");
-const comboPath = makePathMaker("comboCounts");
+const makeMessagesPath = makePathMaker("bombMessages");
+const makeSlinnVodaPath = makePathMaker("slinnVodaScores");
+const makeComboPath = makePathMaker("comboCounts");
 
-const sendBombMsgToDB = (payload) => {
+const makeSanitizedComboPath = (dateTime) => {
+  const sanitizedTimezone = dateTime.zoneName.replace("/", "-");
+  const sanitizedDate = dateTime
+    .toLocaleString(DateTime.DATE_SHORT)
+    .replaceAll("/", "-");
+  return makeComboPath(
+    `${sanitizedTimezone}/${sanitizedDate}/${dateTime.toFormat("a")}`
+  );
+};
+
+const sendBombMsgToDB = async (payload) => {
   try {
-    set(
-      ref(db, messagesPath(`${payload.authorId}/${payload.messageId}`)),
+    await set(
+      ref(db, makeMessagesPath(`${payload.authorId}/${payload.messageId}`)),
       payload
     );
   } catch (e) {
@@ -45,7 +56,7 @@ const sendBombMsgToDB = (payload) => {
 const getBombMsgsFromDB = async (userId) => {
   const dbRef = ref(db);
   try {
-    const resp = await get(child(dbRef, messagesPath(userId)));
+    const resp = await get(child(dbRef, makeMessagesPath(userId)));
     if (!resp.val()) return;
     return Object.values(resp.val());
   } catch (e) {
@@ -53,9 +64,9 @@ const getBombMsgsFromDB = async (userId) => {
   }
 };
 
-const addToSlinnVodaScore = (userId) => {
+const addToSlinnVodaScore = async (userId) => {
   try {
-    set(ref(db, slinnVodaPath(userId)), increment(1));
+    await set(ref(db, makeSlinnVodaPath(userId)), increment(1));
   } catch (e) {
     console.log(e);
   }
@@ -64,7 +75,7 @@ const addToSlinnVodaScore = (userId) => {
 const getSlinnVodaScore = async (userId) => {
   const dbRef = ref(db);
   try {
-    const resp = await get(child(dbRef, slinnVodaPath(userId)));
+    const resp = await get(child(dbRef, makeSlinnVodaPath(userId)));
     if (!resp.val()) return 0;
     return resp.val();
   } catch (e) {
@@ -72,22 +83,25 @@ const getSlinnVodaScore = async (userId) => {
   }
 };
 
-const bombComboToDB = async (msgTimestamp, timezone) => {
-  const nowDate = DateTime.fromMillis(msgTimestamp, {
-    zone: timezone,
-  });
+const bombComboToDB = async (userId, msgDateTime, emoji) => {
   try {
-    set(
-      ref(
-        db,
-        comboPath(
-          `${timezone}/${nowDate.toLocaleString(
-            DateTime.DATE_SHORT
-          )}/${nowDate.toFormat("a")}`
-        )
-      ),
-      increment(1)
+    await set(
+      ref(db, `${makeSanitizedComboPath(msgDateTime)}/${userId}`),
+      emoji
     );
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const isUserInCombo = async (userId, dateInTimezone) => {
+  const dbRef = ref(db);
+  try {
+    const resp = await get(
+      child(dbRef, makeSanitizedComboPath(dateInTimezone))
+    );
+    const comboUsers = resp.val();
+    return has(comboUsers, userId);
   } catch (e) {
     console.log(e);
   }
@@ -98,17 +112,10 @@ const getComboNumberFromDB = async (dateInTimezone) => {
 
   try {
     const resp = await get(
-      child(
-        dbRef,
-        comboPath(
-          `${dateInTimezone.zoneName}/${dateInTimezone.toLocaleString(
-            DateTime.DATE_SHORT
-          )}/${dateInTimezone.toFormat("a")}`
-        )
-      )
+      child(dbRef, makeSanitizedComboPath(dateInTimezone))
     );
     if (!resp.val()) return 0;
-    return resp.val();
+    return size(resp.val());
   } catch (e) {
     console.log(e);
   }
@@ -121,4 +128,5 @@ module.exports = {
   getSlinnVodaScore,
   bombComboToDB,
   getComboNumberFromDB,
+  isUserInCombo,
 };
