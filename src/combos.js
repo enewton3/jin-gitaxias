@@ -22,16 +22,19 @@ const handleComboJob = async (channel) => {
 
   const todaysCombo = await getComboFromDB(dateInFourTwentyTimezone);
 
+  if (!todaysCombo) return;
+
   if (size(todaysCombo) >= 2) {
     const todaysComboEmojis = Object.values(todaysCombo).map(
       (emoji) => `<${emoji}${bombEmojiIdMap[emoji]}>`
     );
 
     channel.send(
-      `${numbersTM[size(todaysCombo)]}   :x:
-    \n🇨 🇨 🇨 🇨🅾️Ⓜ️🅱️🇴:exclamation::exclamation: 
-    \n${todaysComboEmojis.join(" ")}`
+      `${numbersTM[size(todaysCombo)]} ❎
+    \n🇨 🇨 🇨 🇨🅾️Ⓜ️🅱️🇴:grey_exclamation::grey_exclamation: 
+    `
     );
+    channel.send(`${todaysComboEmojis.join(" ")}`);
   }
 };
 
