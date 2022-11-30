@@ -11,11 +11,16 @@ const {
   handleSchedulingInteraction,
   handleSlinnVodaScoreScrapeInteraction,
 } = require("./interactions");
-const { getBombMatches, isSlinnVoda } = require("./emotes-utils");
+const {
+  getBombMatches,
+  isSlinnVoda,
+  getTimezoneForEmoji,
+} = require("./emotes-utils");
 const { addToSlinnVodaScore } = require("./firebase-utils");
 const { handleBombMessage } = require("./messages");
 const { handleComboJob } = require("./combos");
 const { isActiveServer, isProduction, isTESTChannel } = require("./env-utils");
+const { BOMB_TIME_MINUTE } = require("./time-utils");
 
 const intents = new IntentsBitField();
 
@@ -32,6 +37,8 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
+const COMBO_JOB_WAIT_TIME_MINUTES = 2;
+
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
   console.log(`RUNNING IN ${process.env.NODE_ENV}`);
@@ -39,7 +46,7 @@ client.on("ready", async () => {
   const guild = await client.guilds.fetch(`${process.env.SERVER_ID}`);
   const channel = await guild.channels.fetch(`${process.env.CHANNEL_ID}`);
   const comboJob = new cron.CronJob(
-    "22 * * * *",
+    `${(BOMB_TIME_MINUTE + COMBO_JOB_WAIT_TIME_MINUTES) % 60} * * * *`,
     () => handleComboJob(channel),
     () => console.log("Combo job ran"),
     true
@@ -52,19 +59,19 @@ client.on("messageCreate", (msg) => {
   if (msg.channelId !== process.env.CHANNEL_ID) return;
   if (msg.author.id === process.env.BOT_CLIENT_ID) return;
 
-  const matches = getBombMatches(msg.content);
+  let matchingEmojis = getBombMatches(msg.content);
 
-  const timezones = new Set(matches.map(([, timezone]) => timezone));
-
-  // Remove regular bomb from matches if there are more specific bombs
-  if (timezones.size > 1 && timezones.has(null)) {
-    timezones.delete(null);
+  if (matchingEmojis.length > 1) {
+    matchingEmojis = matchingEmojis.filter((emoji) => emoji !== ":bomb:");
   }
 
-  if (timezones.size > 1) {
-    console.log("TOO MANY TUNAS");
-  } else if (timezones.size === 1) {
-    handleBombMessage(msg, matches[0][1]);
+  const timezones = matchingEmojis.map((emoji) => getTimezoneForEmoji(emoji));
+  const timezonesSet = new Set(timezones);
+
+  if (timezonesSet.size > 1) {
+    msg.reply("TOO MANY TUNAS");
+  } else if (timezonesSet.size === 1) {
+    handleBombMessage(msg, timezones[0], matchingEmojis[0]);
   }
 });
 
