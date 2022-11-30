@@ -15,7 +15,7 @@ const { getBombMatches, isSlinnVoda } = require("./emotes-utils");
 const { addToSlinnVodaScore } = require("./firebase-utils");
 const { handleBombMessage } = require("./messages");
 const { handleComboJob } = require("./combos");
-const isActiveServer = require("./env-utils");
+const { isActiveServer, isProduction, isTESTChannel } = require("./env-utils");
 
 const intents = new IntentsBitField();
 
@@ -87,7 +87,11 @@ client.on("messageReactionAdd", async (reaction, user) => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-  if (!isActiveServer(interaction.guild.id)) return;
+  if (!isActiveServer(interaction.guildId)) return;
+  if (!isProduction() && !isTESTChannel(interaction.channelId)) {
+    interaction.reply("Please try again in your own testing channel <3");
+    return;
+  }
 
   if (interaction.commandName === "slinnvodascore") {
     await handleSlinnVodaScoreInteraction(interaction);
