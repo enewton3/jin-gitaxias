@@ -16,6 +16,7 @@ const { addToSlinnVodaScore } = require("./firebase-utils");
 const { handleBombMessage } = require("./messages");
 const { handleComboJob } = require("./combos");
 const isProductionServer = require("./env-utils");
+const isActiveServer = require("./env-utils");
 
 const intents = new IntentsBitField();
 
@@ -87,7 +88,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-  if (!isProductionServer(interaction.guild.id)) return;
+  if (!isActiveServer(interaction.guild.id)) return;
 
   if (interaction.commandName === "slinnvodascore") {
     await handleSlinnVodaScoreInteraction(interaction);
