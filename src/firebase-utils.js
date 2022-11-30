@@ -107,15 +107,14 @@ const isUserInCombo = async (userId, dateInTimezone) => {
   }
 };
 
-const getComboNumberFromDB = async (dateInTimezone) => {
+const getComboFromDB = async (dateInTimezone) => {
   const dbRef = ref(db);
 
   try {
     const resp = await get(
       child(dbRef, makeSanitizedComboPath(dateInTimezone))
     );
-    if (!resp.val()) return 0;
-    return size(resp.val());
+    return resp.val();
   } catch (e) {
     console.log(e);
   }
@@ -127,6 +126,6 @@ module.exports = {
   addToSlinnVodaScore,
   getSlinnVodaScore,
   bombComboToDB,
-  getComboNumberFromDB,
+  getComboFromDB,
   isUserInCombo,
 };

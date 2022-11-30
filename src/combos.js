@@ -1,6 +1,8 @@
+const { size } = require("lodash");
 const { DateTime } = require("luxon");
-const { bombTimezones } = require("./emotes-utils");
-const { getComboNumberFromDB } = require("./firebase-utils");
+const { bombTimezones, bombEmojiIdMap } = require("./emotes-utils");
+const { getComboFromDB } = require("./firebase-utils");
+const { numbersTM } = require("./messages");
 const { matchesBombHour } = require("./time-utils");
 
 const handleComboJob = async (channel) => {
@@ -18,10 +20,18 @@ const handleComboJob = async (channel) => {
 
   if (!dateInFourTwentyTimezone) return;
 
-  const todaysCombo = await getComboNumberFromDB(dateInFourTwentyTimezone);
+  const todaysCombo = await getComboFromDB(dateInFourTwentyTimezone);
 
-  if (todaysCombo >= 2) {
-    channel.send(`${todaysCombo}X COMBO!!!`);
+  if (size(todaysCombo) >= 2) {
+    const todaysComboEmojis = Object.values(todaysCombo).map(
+      (emoji) => `<${emoji}${bombEmojiIdMap[emoji]}>`
+    );
+
+    channel.send(
+      `${numbersTM[size(todaysCombo)]}   :x:
+    \n🇨 🇨 🇨 🇨🅾️Ⓜ️🅱️🇴:exclamation::exclamation: 
+    \n${todaysComboEmojis.join(" ")}`
+    );
   }
 };
 
