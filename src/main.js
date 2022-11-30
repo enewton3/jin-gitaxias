@@ -57,10 +57,7 @@ client.on("ready", async () => {
 
 client.on("messageCreate", (msg) => {
   if (msg.channelId !== process.env.CHANNEL_ID) return;
-  if (msg.author.id === process.env.BOT_CLIENT_ID) {
-    console.log("oop");
-    return;
-  }
+  if (msg.author.id === process.env.BOT_CLIENT_ID) return;
 
   let matchingEmojis = getBombMatches(msg.content);
 
