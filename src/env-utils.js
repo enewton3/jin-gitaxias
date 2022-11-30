@@ -1,3 +1,3 @@
-const isProduction = () => process.env.NODE_ENV === "production";
+const isProductionServer = (guildId) => guildId === process.env.SERVER_ID;
 
-module.exports = isProduction;
+module.exports = isProductionServer;
