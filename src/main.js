@@ -15,7 +15,6 @@ const { getBombMatches, isSlinnVoda } = require("./emotes-utils");
 const { addToSlinnVodaScore } = require("./firebase-utils");
 const { handleBombMessage } = require("./messages");
 const { handleComboJob } = require("./combos");
-const isProductionServer = require("./env-utils");
 const isActiveServer = require("./env-utils");
 
 const intents = new IntentsBitField();
