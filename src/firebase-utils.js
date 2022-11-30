@@ -8,7 +8,6 @@ const {
   increment,
 } = require("firebase/database");
 const { DateTime } = require("luxon");
-const { getNiceDate, getAMorPM } = require("./time-utils");
 
 require("dotenv").config();
 
@@ -25,13 +24,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+const makePathMaker = (sliceName) => (subPath) =>
+  `/${process.env.SERVER_ID}/${sliceName}/${subPath}`;
+
+const messagesPath = makePathMaker("bombMessages");
+const slinnVodaPath = makePathMaker("slinnVodaScores");
+const comboPath = makePathMaker("comboCounts");
+
 const sendBombMsgToDB = (payload) => {
   try {
     set(
-      ref(
-        db,
-        `/bombMessages/${process.env.SERVER_ID}/${payload.authorId}/${payload.messageId}`
-      ),
+      ref(db, messagesPath(`${payload.authorId}/${payload.messageId}`)),
       payload
     );
   } catch (e) {
@@ -42,9 +45,7 @@ const sendBombMsgToDB = (payload) => {
 const getBombMsgsFromDB = async (userId) => {
   const dbRef = ref(db);
   try {
-    const resp = await get(
-      child(dbRef, `/bombMessages/${process.env.SERVER_ID}/${userId}`)
-    );
+    const resp = await get(child(dbRef, messagesPath(userId)));
     if (!resp.val()) return;
     return Object.values(resp.val());
   } catch (e) {
@@ -54,10 +55,7 @@ const getBombMsgsFromDB = async (userId) => {
 
 const addToSlinnVodaScore = (userId) => {
   try {
-    set(
-      ref(db, `/slinnvodascores/${process.env.SERVER_ID}/${userId}`),
-      increment(1)
-    );
+    set(ref(db, slinnVodaPath(userId)), increment(1));
   } catch (e) {
     console.log(e);
   }
@@ -66,9 +64,7 @@ const addToSlinnVodaScore = (userId) => {
 const getSlinnVodaScore = async (userId) => {
   const dbRef = ref(db);
   try {
-    const resp = await get(
-      child(dbRef, `/slinnvodascores/${process.env.SERVER_ID}/${userId}`)
-    );
+    const resp = await get(child(dbRef, slinnVodaPath(userId)));
     if (!resp.val()) return 0;
     return resp.val();
   } catch (e) {
@@ -77,18 +73,18 @@ const getSlinnVodaScore = async (userId) => {
 };
 
 const bombComboToDB = async (msgTimestamp, timezone) => {
-  const nowDate = DateTime.fromMillis(timestamp, {
+  const nowDate = DateTime.fromMillis(msgTimestamp, {
     zone: timezone,
   });
   try {
     set(
       ref(
         db,
-        `/comboCount/${
-          process.env.SERVER_ID
-        }/${timezone}/${nowDate.toLocaleString(
-          DateTime.DATE_SHORT
-        )}/${nowDate.toFormat("a")}`
+        comboPath(
+          `${timezone}/${nowDate.toLocaleString(
+            DateTime.DATE_SHORT
+          )}/${nowDate.toFormat("a")}`
+        )
       ),
       increment(1)
     );
@@ -104,11 +100,11 @@ const getComboNumberFromDB = async (dateInTimezone) => {
     const resp = await get(
       child(
         dbRef,
-        `/comboCount/${process.env.SERVER_ID}/${
-          dateInTimezone.zoneName
-        }/${dateInTimezone.toLocaleString(
-          DateTime.DATE_SHORT
-        )}/${dateInTimezone.toFormat("a")}`
+        comboPath(
+          `${dateInTimezone.zoneName}/${dateInTimezone.toLocaleString(
+            DateTime.DATE_SHORT
+          )}/${dateInTimezone.toFormat("a")}`
+        )
       )
     );
     if (!resp.val()) return 0;

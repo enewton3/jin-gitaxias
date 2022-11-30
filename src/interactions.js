@@ -1,4 +1,5 @@
 const { getBombMsgsFromDB, getSlinnVodaScore } = require("./firebase-utils");
+const Imgflip = require("./imgflip").default;
 const { isFourTwenty } = require("./time-utils");
 
 const handleBombStatsInteraction = async (interaction) => {
@@ -30,7 +31,7 @@ const handleSlinnVodaScoreInteraction = async (interaction) => {
   interaction.reply(`Your Slinn Voda Score is ${userSlinnVodaScore}`);
 };
 
-const handleSchedulingInteraction = (interaction) => {
+const handleSchedulingInteraction = async (interaction) => {
   interaction.reply("Scheduling will happen here eventually");
 };
 

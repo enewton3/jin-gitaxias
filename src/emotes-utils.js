@@ -15,7 +15,9 @@ const bombEmotes = [
   [":bombedalaska:", "America/Anchorage"],
 ];
 
-const bombTimezones = new Set(bombEmotes.map(([, timezone]) => timezone));
+const bombTimezones = new Set(
+  bombEmotes.map(([, timezone]) => timezone || "America/New_York")
+);
 
 const emotes = (str) =>
   str.match(/<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu);
