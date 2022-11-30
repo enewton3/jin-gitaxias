@@ -27,10 +27,6 @@ const getAMorPM = (timestamp, timezone) => {
   return nowDate.toFormat("a");
 };
 
-/**check to see how long since or until fourTwenty
- * @param {number} Date to check against
- * @return {string} a nicely formatted string of hours, minutes, seconds, millis
- */
 const calculateFourTwentyProximity = (msgCreatedTimestamp, bombTimezone) => {
   const nowDate = DateTime.fromMillis(msgCreatedTimestamp, {
     zone: bombTimezone,

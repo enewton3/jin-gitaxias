@@ -50,6 +50,7 @@ client.on("ready", async () => {
 
 client.on("messageCreate", (msg) => {
   if (msg.channelId !== process.env.CHANNEL_ID) return;
+  if (msg.author.id === process.env.BOT_CLIENT_ID) return;
 
   const matches = getBombMatches(msg.content);
 
