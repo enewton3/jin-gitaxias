@@ -1,9 +1,18 @@
+const { minBy } = require("lodash");
 const { DateTime } = require("luxon");
+
+// must be less than 12
+const BOMB_TIME_HOUR_AM = 4;
+const BOMB_TIME_HOUR_PM = BOMB_TIME_HOUR_AM + 12;
+const BOMB_TIME_MINUTE = 20;
+
+const matchesBombHour = (hour) =>
+  hour === BOMB_TIME_HOUR_AM || hour === BOMB_TIME_HOUR_PM;
 
 const isFourTwenty = (timestamp, timezone) => {
   const date = DateTime.fromMillis(timestamp, { zone: timezone });
 
-  if ((date.hour === 16 || date.hour === 4) && date.minute === 20) {
+  if (matchesBombHour(date.hour) && date.minute === BOMB_TIME_MINUTE) {
     return true;
   }
   return false;
@@ -34,61 +43,52 @@ const calculateFourTwentyProximity = (msgCreatedTimestamp, bombTimezone) => {
 
   const diffUnits = ["hours", "minutes", "seconds", "milliseconds"];
 
-  const tenTwentyPM = nowDate.set({
-    hour: 22,
-    minute: 20,
-    second: 0,
-    millisecond: 0,
-  });
+  const potentialFourTwentyDates = [
+    // Yesterday PM
+    nowDate.minus({ days: 1 }).set({
+      hour: BOMB_TIME_HOUR_PM,
+      minute: BOMB_TIME_MINUTE,
+      second: 0,
+      millisecond: 0,
+    }),
+    // Today AM
+    nowDate.set({
+      hour: BOMB_TIME_HOUR_AM,
+      minute: BOMB_TIME_MINUTE,
+      second: 0,
+      millisecond: 0,
+    }),
+    // Today PM
+    nowDate.set({
+      hour: BOMB_TIME_HOUR_PM,
+      minute: BOMB_TIME_MINUTE,
+      second: 0,
+      millisecond: 0,
+    }),
+    // Tomorrow AM
+    nowDate.plus({ days: 1 }).set({
+      hour: BOMB_TIME_HOUR_AM,
+      minute: BOMB_TIME_MINUTE,
+      second: 0,
+      millisecond: 0,
+    }),
+  ];
 
-  if (nowDate > tenTwentyPM) {
-    //early for the next day
-    const nextDayFourTwentyAM = nowDate
-      .plus({ days: 1 })
-      .set({ hour: 4, minute: 20 });
-    const diff = nextDayFourTwentyAM.diff(nowDate, diffUnits).normalize();
+  const closestDate = minBy(potentialFourTwentyDates, (date) =>
+    Math.abs(nowDate.diff(date).milliseconds)
+  );
 
-    return { diff, after: false };
+  if (closestDate > nowDate) {
+    return {
+      diff: closestDate.diff(nowDate, diffUnits).normalize(),
+      after: false,
+    };
   }
 
-  const fourTwentyPM = nowDate.set({
-    hour: 16,
-    minute: 20,
-    second: 0,
-    millisecond: 0,
-  });
-  if (nowDate > fourTwentyPM) {
-    //late for 16:20 today
-    const diff = nowDate.diff(fourTwentyPM, diffUnits).normalize();
-    return { diff, after: true };
-  }
-
-  const tenTwentyAM = nowDate.set({
-    hour: 10,
-    minute: 20,
-    second: 0,
-    millisecond: 0,
-  });
-  if (nowDate > tenTwentyAM) {
-    //early for 16:20 today
-    const diff = fourTwentyPM.diff(nowDate, diffUnits).normalize();
-    return { diff, after: false };
-  }
-
-  const fourTwentyAM = nowDate.set({
-    hour: 4,
-    minute: 20,
-    second: 0,
-    millisecond: 0,
-  });
-  if (nowDate > fourTwentyAM) {
-    //late for 04:20 today
-    const diff = nowDate.diff(fourTwentyAM, diffUnits).normalize();
-    return { diff, after: true };
-  }
-
-  const diff = fourTwentyAM.diff(nowDate, diffUnits).normalize();
-  return { diff, after: false };
+  return {
+    diff: nowDate.diff(closestDate, diffUnits).normalize(),
+    after: true,
+  };
 };
 
 module.exports = {
@@ -97,4 +97,6 @@ module.exports = {
   getNiceTime,
   calculateFourTwentyProximity,
   getAMorPM,
+  matchesBombHour,
+  BOMB_TIME_MINUTE,
 };

@@ -54,7 +54,7 @@ const handleBombMessage = (msg, timezone) => {
   sendBombMsgToDB(dataToSend);
 
   if (isFourTwenty(msg.createdTimestamp, timezone)) {
-    msg.react(":slinnvodapoint:");
+    msg.react("<:slinnvodapoint:724094086323372105>");
     bombComboToDB(msg.createdTimestamp, timezone);
   } else {
     msg.react("🪦");

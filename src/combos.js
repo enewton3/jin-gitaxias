@@ -1,6 +1,7 @@
 const { DateTime } = require("luxon");
 const { bombTimezones } = require("./emotes-utils");
 const { getComboNumberFromDB } = require("./firebase-utils");
+const { matchesBombHour } = require("./time-utils");
 
 const handleComboJob = async (channel) => {
   const nowDate = DateTime.now();
@@ -10,7 +11,7 @@ const handleComboJob = async (channel) => {
   for (const timezone of bombTimezones) {
     const dateInTimezone = nowDate.setZone(timezone);
 
-    if (dateInTimezone.hour === 4 || dateInTimezone.hour === 16) {
+    if (matchesBombHour(dateInTimezone.hour)) {
       dateInFourTwentyTimezone = dateInTimezone;
     }
   }

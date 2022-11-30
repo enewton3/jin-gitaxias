@@ -16,6 +16,7 @@ const { addToSlinnVodaScore } = require("./firebase-utils");
 const { handleBombMessage } = require("./messages");
 const { handleComboJob } = require("./combos");
 const { isActiveServer, isProduction, isTESTChannel } = require("./env-utils");
+const { BOMB_TIME_MINUTE } = require("./time-utils");
 
 const intents = new IntentsBitField();
 
@@ -32,6 +33,8 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
+const COMBO_JOB_WAIT_TIME_MINUTES = 2;
+
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
   console.log(`RUNNING IN ${process.env.NODE_ENV}`);
@@ -39,7 +42,7 @@ client.on("ready", async () => {
   const guild = await client.guilds.fetch(`${process.env.SERVER_ID}`);
   const channel = await guild.channels.fetch(`${process.env.CHANNEL_ID}`);
   const comboJob = new cron.CronJob(
-    "22 * * * *",
+    `${(BOMB_TIME_MINUTE + COMBO_JOB_WAIT_TIME_MINUTES) % 60} * * * *`,
     () => handleComboJob(channel),
     () => console.log("Combo job ran"),
     true
