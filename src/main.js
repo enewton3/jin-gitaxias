@@ -53,6 +53,11 @@ client.on("messageCreate", (msg) => {
 
   const timezones = new Set(matches.map(([, timezone]) => timezone));
 
+  // Remove regular bomb from matches if there are more specific bombs
+  if (timezones.size > 1 && timezones.has(null)) {
+    timezones.delete(null);
+  }
+
   if (timezones.size > 1) {
     console.log("TOO MANY TUNAS");
   } else if (timezones.size === 1) {

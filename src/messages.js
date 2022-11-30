@@ -14,6 +14,35 @@ const numbersTM = {
   0: ":zero:",
 };
 
+const getReplyFormatString = (diff) => {
+  const parts = [];
+
+  if (diff.hours > 0) {
+    parts.push("h 'hours'");
+  }
+  if (diff.minutes > 0) {
+    parts.push("m 'minutes'");
+  }
+  if (diff.seconds > 0) {
+    parts.push("s 'seconds'");
+  }
+  if (diff.milliseconds > 0) {
+    parts.push("S 'milliseconds'");
+  }
+
+  if (parts.length === 1) {
+    return parts[0];
+  }
+
+  parts[parts.length - 1] = `'and' ${parts[parts.length - 1]}`;
+
+  if (parts.length === 2) {
+    return parts.join(" ");
+  }
+
+  return parts.join(",\n\n");
+};
+
 const handleBombMessage = (msg, timezone) => {
   const dataToSend = {
     discordTimestamp: msg.createdTimestamp,
@@ -22,10 +51,10 @@ const handleBombMessage = (msg, timezone) => {
     messageId: msg.id,
     channelId: msg.channelId,
   };
-  console.log(dataToSend);
   sendBombMsgToDB(dataToSend);
 
   if (isFourTwenty(msg.createdTimestamp, timezone)) {
+    msg.react(":slinnvodapoint:");
     bombComboToDB(msg.createdTimestamp, timezone);
   } else {
     msg.react("🪦");
@@ -37,9 +66,9 @@ const handleBombMessage = (msg, timezone) => {
 
     const obnoxiousRegex = new RegExp(Object.keys(numbersTM).join("|"), "gi");
 
-    const replyMsg = `Oop :open_mouth:\n You were:\n\n  ${diff.toFormat(
-      "h 'hours,\n\n'  m 'minutes,\n\n'  s 'seconds,\n\n  and' S 'milliseconds\n\n'"
-    )}  ${after ? "LATE :cold_face:" : "EARLY :hot_face:"}`;
+    const replyMsg = `Oop :open_mouth:\nYou were:\n\n${diff.toFormat(
+      getReplyFormatString(diff)
+    )}\n\n${after ? "LATE :cold_face:" : "EARLY :hot_face:"}`;
 
     msg.reply(
       replyMsg.replace(obnoxiousRegex, (matched) => numbersTM[matched])

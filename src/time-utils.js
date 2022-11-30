@@ -36,6 +36,8 @@ const calculateFourTwentyProximity = (msgCreatedTimestamp, bombTimezone) => {
     zone: bombTimezone,
   });
 
+  const diffUnits = ["hours", "minutes", "seconds", "milliseconds"];
+
   const tenTwentyPM = nowDate.set({
     hour: 22,
     minute: 20,
@@ -48,7 +50,7 @@ const calculateFourTwentyProximity = (msgCreatedTimestamp, bombTimezone) => {
     const nextDayFourTwentyAM = nowDate
       .plus({ days: 1 })
       .set({ hour: 4, minute: 20 });
-    const diff = nextDayFourTwentyAM.diff(nowDate);
+    const diff = nextDayFourTwentyAM.diff(nowDate, diffUnits).normalize();
 
     return { diff, after: false };
   }
@@ -61,7 +63,7 @@ const calculateFourTwentyProximity = (msgCreatedTimestamp, bombTimezone) => {
   });
   if (nowDate > fourTwentyPM) {
     //late for 16:20 today
-    const diff = nowDate.diff(fourTwentyPM);
+    const diff = nowDate.diff(fourTwentyPM, diffUnits).normalize();
     return { diff, after: true };
   }
 
@@ -73,7 +75,7 @@ const calculateFourTwentyProximity = (msgCreatedTimestamp, bombTimezone) => {
   });
   if (nowDate > tenTwentyAM) {
     //early for 16:20 today
-    const diff = fourTwentyPM.diff(nowDate);
+    const diff = fourTwentyPM.diff(nowDate, diffUnits).normalize();
     return { diff, after: false };
   }
 
@@ -85,11 +87,11 @@ const calculateFourTwentyProximity = (msgCreatedTimestamp, bombTimezone) => {
   });
   if (nowDate > fourTwentyAM) {
     //late for 04:20 today
-    const diff = nowDate.diff(fourTwentyAM);
+    const diff = nowDate.diff(fourTwentyAM, diffUnits).normalize();
     return { diff, after: true };
   }
 
-  const diff = fourTwentyAM.diff(nowDate);
+  const diff = fourTwentyAM.diff(nowDate, diffUnits).normalize();
   return { diff, after: false };
 };
 
