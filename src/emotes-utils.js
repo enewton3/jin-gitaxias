@@ -1,6 +1,4 @@
-const { MessageReaction } = require("discord.js");
-
-const bombEmotes = [
+const bombEmojis = [
   [":bomb:", null],
   [":bombisland:", "America/New_York"],
   [":massbomb:", "America/New_York"],
@@ -16,21 +14,27 @@ const bombEmotes = [
 ];
 
 const bombTimezones = new Set(
-  bombEmotes.map(([, timezone]) => timezone || "America/New_York")
+  bombEmojis.map(([, timezone]) => timezone || "America/New_York")
 );
 
-const emotes = (str) =>
+const emojis = (str) =>
   str.match(/<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu);
 
 const getBombMatches = (msgContent) =>
-  bombEmotes.filter(([emote]) => msgContent.includes(emote));
+  bombEmojis
+    .filter(([emoji]) => msgContent.includes(emoji))
+    .map(([emoji]) => emoji);
+
+const getTimezoneForEmoji = (emoji) =>
+  bombEmojis.find(([bombEmoji]) => emoji === bombEmoji)[1];
 
 const isSlinnVoda = (reaction) => reaction === "slinnvodapoint";
 
 module.exports = {
-  emotes,
-  bombEmotes,
+  emojis,
+  bombEmojis,
   bombTimezones,
   getBombMatches,
   isSlinnVoda,
+  getTimezoneForEmoji,
 };

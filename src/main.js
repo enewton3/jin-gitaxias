@@ -11,7 +11,11 @@ const {
   handleSchedulingInteraction,
   handleSlinnVodaScoreScrapeInteraction,
 } = require("./interactions");
-const { getBombMatches, isSlinnVoda } = require("./emotes-utils");
+const {
+  getBombMatches,
+  isSlinnVoda,
+  getTimezoneForEmoji,
+} = require("./emotes-utils");
 const { addToSlinnVodaScore } = require("./firebase-utils");
 const { handleBombMessage } = require("./messages");
 const { handleComboJob } = require("./combos");
@@ -55,19 +59,19 @@ client.on("messageCreate", (msg) => {
   if (msg.channelId !== process.env.CHANNEL_ID) return;
   if (msg.author.id === process.env.BOT_CLIENT_ID) return;
 
-  const matches = getBombMatches(msg.content);
+  let matchingEmojis = getBombMatches(msg.content);
 
-  const timezones = new Set(matches.map(([, timezone]) => timezone));
-
-  // Remove regular bomb from matches if there are more specific bombs
-  if (timezones.size > 1 && timezones.has(null)) {
-    timezones.delete(null);
+  if (matchingEmojis.length > 1) {
+    matchingEmojis = matchingEmojis.filter((emoji) => emoji !== ":bomb:");
   }
 
-  if (timezones.size > 1) {
-    console.log("TOO MANY TUNAS");
-  } else if (timezones.size === 1) {
-    handleBombMessage(msg, matches[0][1]);
+  const timezones = matchingEmojis.map((emoji) => getTimezoneForEmoji(emoji));
+  const timezonesSet = new Set(timezones);
+
+  if (timezonesSet.size > 1) {
+    msg.reply("TOO MANY TUNAS");
+  } else if (timezonesSet.size === 1) {
+    handleBombMessage(msg, timezones[0], matchingEmojis[0]);
   }
 });
 

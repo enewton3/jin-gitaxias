@@ -1,10 +1,12 @@
+require("dotenv").config();
+
 const { minBy } = require("lodash");
 const { DateTime } = require("luxon");
 
 // must be less than 12
-const BOMB_TIME_HOUR_AM = 4;
+const BOMB_TIME_HOUR_AM = parseInt(process.env.BOMB_TIME_HOUR);
 const BOMB_TIME_HOUR_PM = BOMB_TIME_HOUR_AM + 12;
-const BOMB_TIME_MINUTE = 20;
+const BOMB_TIME_MINUTE = parseInt(process.env.BOMB_TIME_MINUTE);
 
 const matchesBombHour = (hour) =>
   hour === BOMB_TIME_HOUR_AM || hour === BOMB_TIME_HOUR_PM;

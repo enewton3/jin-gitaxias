@@ -1,4 +1,9 @@
-const { sendBombMsgToDB, bombComboToDB } = require("./firebase-utils");
+const { DateTime } = require("luxon");
+const {
+  sendBombMsgToDB,
+  bombComboToDB,
+  isUserInCombo,
+} = require("./firebase-utils");
 const { isFourTwenty, calculateFourTwentyProximity } = require("./time-utils");
 
 const numbersTM = {
@@ -43,7 +48,7 @@ const getReplyFormatString = (diff) => {
   return parts.join(",\n\n");
 };
 
-const handleBombMessage = (msg, timezone) => {
+const handleBombMessage = async (msg, timezone, emoji) => {
   const dataToSend = {
     discordTimestamp: msg.createdTimestamp,
     authorId: msg.author.id,
@@ -54,8 +59,15 @@ const handleBombMessage = (msg, timezone) => {
   sendBombMsgToDB(dataToSend);
 
   if (isFourTwenty(msg.createdTimestamp, timezone)) {
-    msg.react("<:slinnvodapoint:724094086323372105>");
-    bombComboToDB(msg.createdTimestamp, timezone);
+    const msgDateTime = DateTime.fromMillis(msg.createdTimestamp, {
+      zone: timezone,
+    });
+    if (await isUserInCombo(msg.author.id, msgDateTime)) {
+      msg.react("<:sensingaplot:885662119415148564>");
+    } else {
+      msg.react("<:slinnvodapoint:724094086323372105>");
+      bombComboToDB(msg.author.id, msgDateTime, emoji);
+    }
   } else {
     msg.react("🪦");
 
