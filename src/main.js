@@ -71,6 +71,7 @@ client.on("messageCreate", (msg) => {
   if (timezonesSet.size > 1) {
     msg.reply("TOO MANY TUNAS");
   } else if (timezonesSet.size === 1) {
+    console.log(`Handling bomb message for ${msg.author.id} `);
     handleBombMessage(msg, timezones[0], matchingEmojis[0]);
   }
 });
@@ -89,6 +90,9 @@ client.on("messageReactionAdd", async (reaction, user) => {
     isSlinnVoda(reaction.emoji.name) &&
     user.id !== reaction.message.author.id
   ) {
+    console.log(
+      `Handling add to slinnvoda score for ${reaction.message.author.id}`
+    );
     addToSlinnVodaScore(reaction.message.author.id);
   }
 });
@@ -97,6 +101,10 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
   if (!isActiveServer(interaction.guildId)) return;
   if (!isProduction() && !isTESTChannel(interaction.channelId)) return;
+
+  console.log(
+    `Handling ${interaction.commandName} request from ${interaction.user.id}`
+  );
 
   if (interaction.commandName === "slinnvodascore") {
     await handleSlinnVodaScoreInteraction(interaction);
