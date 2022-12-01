@@ -10,6 +10,7 @@ const {
   handleBombMessageScrapeInteraction,
   handleSchedulingInteraction,
   handleSlinnVodaScoreScrapeInteraction,
+  handleSchedulingButtonInteraction,
 } = require("./interactions");
 const {
   getBombMatches,
@@ -98,32 +99,34 @@ client.on("messageReactionAdd", async (reaction, user) => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
   if (!isActiveServer(interaction.guildId)) return;
   if (!isProduction() && !isTESTChannel(interaction.channelId)) return;
 
-  console.log(
-    `Handling ${interaction.commandName} request from ${interaction.user.id}`
-  );
+  if (interaction.isButton()) {
+    if (interaction.message.interaction.commandName === "itstimetoduel") {
+      await handleSchedulingButtonInteraction(interaction);
+    }
+  } else if (interaction.isChatInputCommand()) {
+    if (interaction.commandName === "slinnvodascore") {
+      await handleSlinnVodaScoreInteraction(interaction);
+    }
 
-  if (interaction.commandName === "slinnvodascore") {
-    await handleSlinnVodaScoreInteraction(interaction);
-  }
+    if (interaction.commandName === "bombstats") {
+      await handleBombStatsInteraction(interaction);
+    }
 
-  if (interaction.commandName === "bombstats") {
-    await handleBombStatsInteraction(interaction);
-  }
+    if (interaction.commandName === "itstimetoduel") {
+      await handleSchedulingInteraction(interaction, client);
+      interaction.channel.createMessageComponentCollector;
+    }
 
-  if (interaction.commandName === "itstimetoduel") {
-    await handleSchedulingInteraction(interaction);
-  }
+    if (interaction.commandName === "bombmessagesscrape") {
+      await handleBombMessageScrapeInteraction(interaction);
+    }
 
-  if (interaction.commandName === "bombmessagesscrape") {
-    await handleBombMessageScrapeInteraction(interaction);
-  }
-
-  if (interaction.commandName === "slinnvodascrape") {
-    await handleSlinnVodaScoreScrapeInteraction(interaction);
+    if (interaction.commandName === "slinnvodascrape") {
+      await handleSlinnVodaScoreScrapeInteraction(interaction);
+    }
   }
 });
 

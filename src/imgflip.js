@@ -1,3 +1,5 @@
+const { sample } = require("lodash");
+
 const axios = require("axios").default;
 
 const BASE_URL = "https://api.imgflip.com";
@@ -13,6 +15,7 @@ class Imgflip {
       url,
       method,
       baseURL: BASE_URL,
+      headers: { Accept: "application/json", "Accept-Encoding": "identity" },
       ...options,
     });
 
@@ -24,21 +27,26 @@ class Imgflip {
   }
 
   async post(url, data, options) {
-    return await this.request(url, "post", { data, ...options });
+    const urlParams = new URLSearchParams(data);
+    return await this.request(url, "post", {
+      data: urlParams.toString(),
+      ...options,
+    });
   }
 
   async memes() {
-    return (await this.get("get_memes")).memes;
+    return (await this.get("get_memes")).data.memes;
   }
 
-  async meme(id, { captions, font, maxFontSize }) {
+  async createMeme(id, { captions, font, maxFontSize }) {
     const data = {
-      // eslint-disable-next-line camelcase
       template_id: id,
       username: this.username,
       password: this.password,
       ...Object.assign(
-        ...captions.map((caption, i) => ({ [`boxes[${i}][text]`]: caption }))
+        ...captions.map((caption, i) => ({
+          [`boxes[${i}][text]`]: caption.toUpperCase(),
+        }))
       ),
     };
 
@@ -47,13 +55,17 @@ class Imgflip {
     }
 
     if (maxFontSize != null) {
-      // eslint-disable-next-line camelcase
       data.max_font_size = maxFontSize;
     }
 
-    const { url } = await this.post("caption_image", data);
+    const response = await this.post("caption_image", data);
 
-    return url;
+    return response.data.url;
+  }
+
+  async randomMeme(maxBoxes) {
+    const allMemes = await this.memes();
+    return sample(allMemes.filter((meme) => meme.box_count <= (maxBoxes || 2)));
   }
 }
 
