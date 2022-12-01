@@ -6,8 +6,9 @@ const {
   get,
   child,
   increment,
+  runTransaction,
 } = require("firebase/database");
-const { size, has } = require("lodash");
+const { size, has, invert, mapValues } = require("lodash");
 const { DateTime } = require("luxon");
 
 require("dotenv").config();
@@ -31,6 +32,7 @@ const makePathMaker = (sliceName) => (subPath) =>
 const makeMessagesPath = makePathMaker("bombMessages");
 const makeSlinnVodaPath = makePathMaker("slinnVodaScores");
 const makeComboPath = makePathMaker("comboCounts");
+const makeGameNightPath = makePathMaker("gameNights");
 
 const makeSanitizedComboPath = (dateTime) => {
   const sanitizedTimezone = dateTime.zoneName.replace("/", "-");
@@ -120,6 +122,48 @@ const getComboFromDB = async (dateInTimezone) => {
   }
 };
 
+const storeSchedulingMemeRecord = async (
+  week,
+  messageId,
+  memeUrl,
+  weekendDayIds,
+  weekendEmojis
+) => {
+  try {
+    await set(ref(db, makeGameNightPath(week)), {
+      messageId,
+      memeUrl,
+      days: mapValues(invert(weekendDayIds), (day) => ({
+        day,
+        emoji: weekendEmojis[day],
+      })),
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const toggleUserInterestForGameNight = async (userId, week, weekendDayId) => {
+  const userInterestRef = ref(
+    db,
+    makeGameNightPath(`${week}/days/${weekendDayId}/users/${userId}`)
+  );
+  await runTransaction(userInterestRef, (userInterest) => {
+    return !userInterest;
+  });
+};
+
+const getUsersForGameNights = async (week) => {
+  const dbRef = ref(db);
+
+  try {
+    const resp = await get(child(dbRef, makeGameNightPath(`${week}/days`)));
+    return resp.val();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 module.exports = {
   sendBombMsgToDB,
   getBombMsgsFromDB,
@@ -128,4 +172,7 @@ module.exports = {
   bombComboToDB,
   getComboFromDB,
   isUserInCombo,
+  storeSchedulingMemeRecord,
+  toggleUserInterestForGameNight,
+  getUsersForGameNights,
 };
