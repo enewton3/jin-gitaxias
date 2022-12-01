@@ -40,7 +40,6 @@ class Imgflip {
 
   async createMeme(id, { captions, font, maxFontSize }) {
     const data = {
-      // eslint-disable-next-line camelcase
       template_id: id,
       username: this.username,
       password: this.password,
@@ -56,7 +55,6 @@ class Imgflip {
     }
 
     if (maxFontSize != null) {
-      // eslint-disable-next-line camelcase
       data.max_font_size = maxFontSize;
     }
 

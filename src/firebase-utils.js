@@ -8,7 +8,7 @@ const {
   increment,
   runTransaction,
 } = require("firebase/database");
-const { size, has, invert, mapValues } = require("lodash");
+const { has, invert, mapValues } = require("lodash");
 const { DateTime } = require("luxon");
 
 require("dotenv").config();
@@ -148,9 +148,7 @@ const toggleUserInterestForGameNight = async (userId, week, weekendDayId) => {
     db,
     makeGameNightPath(`${week}/days/${weekendDayId}/users/${userId}`)
   );
-  await runTransaction(userInterestRef, (userInterest) => {
-    return !userInterest;
-  });
+  await runTransaction(userInterestRef, (userInterest) => !userInterest);
 };
 
 const getUsersForGameNights = async (week) => {
