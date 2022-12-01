@@ -23,6 +23,12 @@ const ALL_MEME_CAPTIONS = [
     "we actually play magic",
   ],
   ["so elder", "such dragon", "very highlander", "pls react for schedule"],
+  ["i spent a lot of money on cardboard", "i hope i get to play this weekend"],
+  ["donate your free time", "to jin-gitaxias"],
+  [
+    "don't be like this asshole",
+    "everyone hates him and he's a pariah to his people",
+  ],
 ];
 
 const MAX_BOXES = max(ALL_MEME_CAPTIONS.map((captions) => captions.length));
