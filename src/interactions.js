@@ -55,8 +55,6 @@ const handleSlinnVodaScoreInteraction = async (interaction) => {
   interaction.reply(`Your Slinn Voda Score is ${userSlinnVodaScore}`);
 };
 
-const IN_RESPONSE_GUILD_ID = "513000811589009423";
-
 const BLANK_EMBED_FIELD = { name: "\u200b", value: "\u200b" };
 
 const getCurrentWeek = () => DateTime.now().startOf("week").toISODate();
@@ -74,7 +72,9 @@ const getSchedulingEmbedFields = (allDays) => {
 };
 
 const handleSchedulingInteraction = async (interaction, client) => {
-  const inResponseGuild = await client.guilds.fetch(IN_RESPONSE_GUILD_ID);
+  const inResponseGuild = await client.guilds.fetch(
+    process.env.IN_RESPONSE_GUILD_ID
+  );
   const inResponseEmojis = inResponseGuild.emojis.cache
     .map((emoji) => emoji.toString())
     .filter((emoji) => !emoji.includes("bomb"));
