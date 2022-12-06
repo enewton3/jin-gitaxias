@@ -221,7 +221,7 @@ const eventCreatorJob = async (channelId, client) => {
     times.forEach(async (timeObj) => {
       const [time, users] = timeObj;
       //change me when push to prod
-      if (Object.entries(users).length >= 1) {
+      if (Object.entries(users).length >= 3) {
         const now = DateTime.now();
 
         const weekdayNum = weekdaysMap[dayObj.day];
