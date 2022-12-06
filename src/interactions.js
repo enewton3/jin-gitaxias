@@ -168,6 +168,11 @@ const handleSchedulingButtonInteraction = async (interaction) => {
   interaction.deferUpdate();
 };
 
+const handleJinVodaScore = async (interaction) => {
+  const botScore = await getSlinnVodaScore(process.env.BOT_CLIENT_ID);
+  interaction.reply(`So you do care! Jin Voda Score is ${botScore}`);
+};
+
 const handleBombMessageScrapeInteraction = (interaction) => {
   interaction.reply("Will be supported eventually");
 };

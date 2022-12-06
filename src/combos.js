@@ -40,9 +40,8 @@ const handleComboJob = async (channel) => {
   }
 };
 
-const streakCounter = () => {
-  
-}
+// const streakCounter = () => {
 
+// }
 
 module.exports = { handleComboJob };
