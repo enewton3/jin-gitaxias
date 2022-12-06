@@ -1,9 +1,10 @@
 const { size } = require("lodash");
 const { DateTime } = require("luxon");
-const { bombTimezones, bombEmojiIdMap } = require("./emotes-utils");
-const { getComboFromDB } = require("./firebase-utils");
+
 const { numbersTM } = require("./messages");
-const { matchesBombHour } = require("./time-utils");
+const { bombTimezones, bombEmojiIdMap } = require("./utils/emotes");
+const { getComboFromDB } = require("./utils/firebase");
+const { matchesBombHour } = require("./utils/time");
 
 const handleComboJob = async (channel) => {
   const nowDate = DateTime.now();

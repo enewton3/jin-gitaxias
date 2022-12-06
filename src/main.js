@@ -1,8 +1,8 @@
 require("dotenv").config();
 
-const botId = process.env.BOT_TOKEN;
-
 const { Client, IntentsBitField, Partials } = require("discord.js");
+
+const { handleComboJob } = require("./combos");
 const { CronJob } = require("cron");
 const {
   handleBombStatsInteraction,
@@ -13,26 +13,21 @@ const {
   handleSchedulingButtonInteraction,
 } = require("./interactions");
 const {
-  getBombMatches,
-  isSlinnVoda,
-  getTimezoneForEmoji,
-} = require("./emotes-utils");
-const {
-  addToSlinnVodaScore,
-  setVoteForGameNightTime,
-} = require("./firebase-utils");
-const { handleBombMessage } = require("./messages");
-const { handleComboJob } = require("./combos");
-const { isActiveServer, isProduction, isTESTChannel } = require("./env-utils");
-const { BOMB_TIME_MINUTE } = require("./time-utils");
-const {
-  schedulerJob,
-  handleSchedulingTimeButtonInteraction,
-  schedulerJobScheduler,
-} = require("./scheduling-utils");
+  maybeHandleBombMessage,
+  maybeHandleCommanderDamageMessage,
+  maybeHandleForgetfulMessage,
+  maybeHandleGoodBot,
+  maybeHandleJinMention,
+} = require("./messages");
+const { maybeHandleSlinnVodaScore } = require("./reactions");
+const { isActiveServer, isProduction, isTESTChannel } = require("./utils/env");
+const { handleSchedulingTimeButtonInteraction } = require("./utils/scheduling");
+const { BOMB_TIME_MINUTE } = require("./utils/time");
+
+const botId = process.env.BOT_TOKEN;
+const COMBO_JOB_WAIT_TIME_MINUTES = 2;
 
 const intents = new IntentsBitField();
-
 intents.add(
   IntentsBitField.Flags.GuildMessages,
   IntentsBitField.Flags.Guilds,
@@ -45,8 +40,6 @@ const client = new Client({
   intents: intents,
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
-
-const COMBO_JOB_WAIT_TIME_MINUTES = 2;
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -68,21 +61,11 @@ client.on("messageCreate", (msg) => {
   if (msg.channelId !== process.env.CHANNEL_ID) return;
   if (msg.author.id === process.env.BOT_CLIENT_ID) return;
 
-  let matchingEmojis = getBombMatches(msg.content);
-
-  if (matchingEmojis.length > 1) {
-    matchingEmojis = matchingEmojis.filter((emoji) => emoji !== ":bomb:");
-  }
-
-  const timezones = matchingEmojis.map((emoji) => getTimezoneForEmoji(emoji));
-  const timezonesSet = new Set(timezones);
-
-  if (timezonesSet.size > 1) {
-    msg.reply("TOO MANY TUNAS");
-  } else if (timezonesSet.size === 1) {
-    console.log(`Handling bomb message for ${msg.author.id} `);
-    handleBombMessage(msg, timezones[0], matchingEmojis[0]);
-  }
+  maybeHandleBombMessage(msg);
+  maybeHandleCommanderDamageMessage(msg);
+  maybeHandleForgetfulMessage(msg);
+  maybeHandleGoodBot(msg);
+  maybeHandleJinMention(msg);
 });
 
 client.on("messageReactionAdd", async (reaction, user) => {
@@ -95,15 +78,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
     }
   }
 
-  if (
-    isSlinnVoda(reaction.emoji.name) &&
-    user.id !== reaction.message.author.id
-  ) {
-    console.log(
-      `Handling add to slinnvoda score for ${reaction.message.author.id}`
-    );
-    addToSlinnVodaScore(reaction.message.author.id);
-  }
+  maybeHandleSlinnVodaScore(reaction, user);
 });
 
 client.on("interactionCreate", async (interaction) => {

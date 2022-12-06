@@ -16,6 +16,6 @@
   },
   "scripts": {
     "start": "node src/main.js",
-    "deploy": "node src/deploy-commands.js"
+    "deploy": "node src/executables/deploy-commands.js"
   }
 }
