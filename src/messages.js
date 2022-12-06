@@ -1,10 +1,12 @@
 const { DateTime } = require("luxon");
+
+const { getBombMatches, getTimezoneForEmoji } = require("./utils/emotes");
 const {
   sendBombMsgToDB,
   bombComboToDB,
   isUserInCombo,
-} = require("./firebase-utils");
-const { isFourTwenty, calculateFourTwentyProximity } = require("./time-utils");
+} = require("./utils/firebase");
+const { isFourTwenty, calculateFourTwentyProximity } = require("./utils/time");
 
 const numbersTM = {
   1: ":one:",
@@ -46,6 +48,24 @@ const getReplyFormatString = (diff) => {
   }
 
   return parts.join(",\n\n");
+};
+
+const maybeHandleBombMessage = (msg) => {
+  let matchingEmojis = getBombMatches(msg.content);
+
+  if (matchingEmojis.length > 1) {
+    matchingEmojis = matchingEmojis.filter((emoji) => emoji !== ":bomb:");
+  }
+
+  const timezones = matchingEmojis.map((emoji) => getTimezoneForEmoji(emoji));
+  const timezonesSet = new Set(timezones);
+
+  if (timezonesSet.size > 1) {
+    msg.reply("TOO MANY TUNAS");
+  } else if (timezonesSet.size === 1) {
+    console.log(`Handling bomb message for ${msg.author.id} `);
+    handleBombMessage(msg, timezones[0], matchingEmojis[0]);
+  }
 };
 
 const handleBombMessage = async (msg, timezone, emoji) => {
@@ -93,4 +113,4 @@ const handleBombMessage = async (msg, timezone, emoji) => {
   }
 };
 
-module.exports = { handleBombMessage, numbersTM };
+module.exports = { maybeHandleBombMessage, numbersTM };

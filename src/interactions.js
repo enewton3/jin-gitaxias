@@ -8,17 +8,17 @@ const { sampleSize, sortBy, capitalize, pickBy } = require("lodash");
 const { DateTime } = require("luxon");
 const { v4 } = require("uuid");
 
+const Imgflip = require("./imgflip").default;
 const {
   getBombMsgsFromDB,
   getSlinnVodaScore,
   toggleUserInterestForGameNight,
   storeSchedulingMemeRecord,
   getUsersForGameNights,
-} = require("./firebase-utils");
-const { getBombMatches, getTimezoneForEmoji } = require("./emotes-utils");
-const { getMemeCaptions, MAX_BOXES } = require("./scheduling-utils");
-const Imgflip = require("./imgflip").default;
-const { isFourTwenty } = require("./time-utils");
+} = require("./utils/firebase");
+const { getBombMatches, getTimezoneForEmoji } = require("./utils/emotes");
+const { getMemeCaptions, MAX_BOXES } = require("./utils/scheduling");
+const { isFourTwenty } = require("./utils/time");
 
 const imgflip = new Imgflip({
   username: process.env.IMGFLIP_USERNAME,
