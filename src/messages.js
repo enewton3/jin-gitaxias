@@ -1,3 +1,4 @@
+const { some, isArray, every } = require("lodash");
 const { DateTime } = require("luxon");
 
 const { getBombMatches, getTimezoneForEmoji } = require("./utils/emotes");
@@ -50,6 +51,28 @@ const getReplyFormatString = (diff) => {
   return parts.join(",\n\n");
 };
 
+const makeMatchingTextHandler = (callback, ...stringMatches) => {
+  // string matches can be any number of arguments, each argument can be:
+  // - a string, in which case it will match case insensitive
+  // - an array of strings, in which case it will check if all items are in the message
+  //   (regardless of order)
+  return (msg) => {
+    if (
+      some(stringMatches, (match) => {
+        if (isArray(match)) {
+          return every(match, (matchStr) =>
+            msg.content.toLowerCase().includes(matchStr)
+          );
+        } else {
+          return msg.content.toLowerCase().includes(match);
+        }
+      })
+    ) {
+      callback(msg);
+    }
+  };
+};
+
 const maybeHandleBombMessage = (msg) => {
   let matchingEmojis = getBombMatches(msg.content);
 
@@ -67,6 +90,35 @@ const maybeHandleBombMessage = (msg) => {
     handleBombMessage(msg, timezones[0], matchingEmojis[0]);
   }
 };
+
+const maybeHandleCommanderDamageMessage = makeMatchingTextHandler(
+  (msg) => {
+    msg.reply(`<@${process.env.TOM_ID}>`);
+  },
+  "commander damage",
+  ["commander", "damage"]
+);
+
+const maybeHandleForgetfulMessage = makeMatchingTextHandler(
+  (msg) => {
+    msg.reply(process.env.FORGOT_ABOUT_DRE_URL);
+  },
+  "forgot",
+  "forget",
+  "dre"
+);
+
+const maybeHandleGoodBot = makeMatchingTextHandler(
+  (msg) => {
+    msg.react("<:soup:896939920223010886>");
+  },
+  "good bot",
+  ["good", "bot"]
+);
+
+const maybeHandleJinMention = makeMatchingTextHandler((msg) => {
+  msg.react("<:jinspice:812112198573883393>");
+}, "jin");
 
 const handleBombMessage = async (msg, timezone, emoji) => {
   const dataToSend = {
@@ -113,4 +165,11 @@ const handleBombMessage = async (msg, timezone, emoji) => {
   }
 };
 
-module.exports = { maybeHandleBombMessage, numbersTM };
+module.exports = {
+  maybeHandleBombMessage,
+  maybeHandleCommanderDamageMessage,
+  maybeHandleForgetfulMessage,
+  maybeHandleGoodBot,
+  maybeHandleJinMention,
+  numbersTM,
+};
