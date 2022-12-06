@@ -7,14 +7,13 @@ const {
 } = require("discord.js");
 const { sample, max, pickBy } = require("lodash");
 const { DateTime } = require("luxon");
-const { handleCreateGuildEvent } = require("./events-utils");
+const { handleCreateGuildEvent } = require("./events");
 const {
   getUsersForGameNights,
   toggleUserInterestForGameNightTime,
   getUsersForGameNightTimes,
-} = require("./firebase-utils");
-// const { BLANK_EMBED_FIELD } = require("./interactions");
-const { getCurrentWeek } = require("./time-utils");
+} = require("./firebase");
+const { getCurrentWeek } = require("./time");
 
 const ALL_MEME_CAPTIONS = [
   ["in response", "jin-gitaxias"],

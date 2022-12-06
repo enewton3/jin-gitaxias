@@ -19,10 +19,6 @@ const {
 const { getBombMatches, getTimezoneForEmoji } = require("./utils/emotes");
 const { getMemeCaptions, MAX_BOXES } = require("./utils/scheduling");
 const { isFourTwenty } = require("./utils/time");
-const { getBombMatches, getTimezoneForEmoji } = require("./emotes-utils");
-const { getMemeCaptions, MAX_BOXES } = require("./scheduling-utils");
-const Imgflip = require("./imgflip").default;
-const { isFourTwenty, getCurrentWeek } = require("./time-utils");
 
 const imgflip = new Imgflip({
   username: process.env.IMGFLIP_USERNAME,

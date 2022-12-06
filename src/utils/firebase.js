@@ -10,7 +10,6 @@ const {
 } = require("firebase/database");
 const { has, invert, mapValues } = require("lodash");
 const { DateTime } = require("luxon");
-const { getCurrentWeek } = require("./time-utils");
 
 require("dotenv").config();
 
