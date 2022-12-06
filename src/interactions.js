@@ -184,5 +184,5 @@ module.exports = {
   handleBombMessageScrapeInteraction,
   handleSlinnVodaScoreScrapeInteraction,
   handleSchedulingButtonInteraction,
-  BLANK_EMBED_FIELD,
+  handleJinVodaScore,
 };

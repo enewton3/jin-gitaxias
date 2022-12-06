@@ -11,6 +11,7 @@ const {
   handleSchedulingInteraction,
   handleSlinnVodaScoreScrapeInteraction,
   handleSchedulingButtonInteraction,
+  handleJinVodaScore,
 } = require("./interactions");
 const {
   maybeHandleBombMessage,
@@ -108,6 +109,10 @@ client.on("interactionCreate", async (interaction) => {
       interaction.channel.createMessageComponentCollector;
 
       await schedulerJobScheduler(interaction.channelId, client);
+    }
+
+    if (interaction.commandName === "jinvodascore") {
+      await handleJinVodaScore(interaction);
     }
 
     if (interaction.commandName === "bombmessagesscrape") {
