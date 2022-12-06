@@ -12,7 +12,13 @@ const {
   handleSlinnVodaScoreScrapeInteraction,
   handleSchedulingButtonInteraction,
 } = require("./interactions");
-const { maybeHandleBombMessage } = require("./messages");
+const {
+  maybeHandleBombMessage,
+  maybeHandleCommanderDamageMessage,
+  maybeHandleForgetfulMessage,
+  maybeHandleGoodBot,
+  maybeHandleJinMention,
+} = require("./messages");
 const { maybeHandleSlinnVodaScore } = require("./reactions");
 const { isActiveServer, isProduction, isTESTChannel } = require("./utils/env");
 const { BOMB_TIME_MINUTE } = require("./utils/time");
@@ -55,6 +61,10 @@ client.on("messageCreate", (msg) => {
   if (msg.author.id === process.env.BOT_CLIENT_ID) return;
 
   maybeHandleBombMessage(msg);
+  maybeHandleCommanderDamageMessage(msg);
+  maybeHandleForgetfulMessage(msg);
+  maybeHandleGoodBot(msg);
+  maybeHandleJinMention(msg);
 });
 
 client.on("messageReactionAdd", async (reaction, user) => {
