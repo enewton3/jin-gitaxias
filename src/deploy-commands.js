@@ -35,6 +35,9 @@ const commands = [
   new SlashCommandBuilder()
     .setName("itstimetoduel")
     .setDescription("Start a poll GIF to schedule a game night!"),
+  new SlashCommandBuilder()
+    .setName("jinvodascore")
+    .setDescription("Jin's personal Slinn Voda Score. What a good bot."),
 ].map((command) => command.toJSON());
 
 const emptyCommands = [];

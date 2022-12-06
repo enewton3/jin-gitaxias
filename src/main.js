@@ -1,9 +1,9 @@
 require("dotenv").config();
-const cron = require("cron");
 
 const botId = process.env.BOT_TOKEN;
 
 const { Client, IntentsBitField, Partials } = require("discord.js");
+const { CronJob } = require("cron");
 const {
   handleBombStatsInteraction,
   handleSlinnVodaScoreInteraction,
@@ -17,11 +17,19 @@ const {
   isSlinnVoda,
   getTimezoneForEmoji,
 } = require("./emotes-utils");
-const { addToSlinnVodaScore } = require("./firebase-utils");
+const {
+  addToSlinnVodaScore,
+  setVoteForGameNightTime,
+} = require("./firebase-utils");
 const { handleBombMessage } = require("./messages");
 const { handleComboJob } = require("./combos");
 const { isActiveServer, isProduction, isTESTChannel } = require("./env-utils");
 const { BOMB_TIME_MINUTE } = require("./time-utils");
+const {
+  schedulerJob,
+  handleSchedulingTimeButtonInteraction,
+  schedulerJobScheduler,
+} = require("./scheduling-utils");
 
 const intents = new IntentsBitField();
 
@@ -46,10 +54,10 @@ client.on("ready", async () => {
 
   const guild = await client.guilds.fetch(`${process.env.SERVER_ID}`);
   const channel = await guild.channels.fetch(`${process.env.CHANNEL_ID}`);
-  const comboJob = new cron.CronJob(
+  const comboJob = new CronJob(
     `${(BOMB_TIME_MINUTE + COMBO_JOB_WAIT_TIME_MINUTES) % 60} * * * *`,
     () => handleComboJob(channel),
-    () => console.log("Combo job ran"),
+    () => console.log("Combo job stopped"),
     true
   );
 
@@ -103,6 +111,11 @@ client.on("interactionCreate", async (interaction) => {
   if (!isProduction() && !isTESTChannel(interaction.channelId)) return;
 
   if (interaction.isButton()) {
+    if (interaction.message.content.includes("PICK A TIME")) {
+      handleSchedulingTimeButtonInteraction(interaction);
+    }
+
+    if (!interaction.message.interaction) return;
     if (interaction.message.interaction.commandName === "itstimetoduel") {
       await handleSchedulingButtonInteraction(interaction);
     }
@@ -118,6 +131,8 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.commandName === "itstimetoduel") {
       await handleSchedulingInteraction(interaction, client);
       interaction.channel.createMessageComponentCollector;
+
+      await schedulerJobScheduler(interaction.channelId, client);
     }
 
     if (interaction.commandName === "bombmessagesscrape") {

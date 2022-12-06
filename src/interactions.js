@@ -16,9 +16,13 @@ const {
   getUsersForGameNights,
 } = require("./firebase-utils");
 const { getBombMatches, getTimezoneForEmoji } = require("./emotes-utils");
-const { getMemeCaptions, MAX_BOXES } = require("./scheduling-utils");
+const {
+  getMemeCaptions,
+  MAX_BOXES,
+  schedulerJob,
+} = require("./scheduling-utils");
 const Imgflip = require("./imgflip").default;
-const { isFourTwenty } = require("./time-utils");
+const { isFourTwenty, getCurrentWeek } = require("./time-utils");
 
 const imgflip = new Imgflip({
   username: process.env.IMGFLIP_USERNAME,
@@ -56,8 +60,6 @@ const handleSlinnVodaScoreInteraction = async (interaction) => {
 };
 
 const BLANK_EMBED_FIELD = { name: "\u200b", value: "\u200b" };
-
-const getCurrentWeek = () => DateTime.now().startOf("week").toISODate();
 
 const getSchedulingEmbedFields = (allDays) => {
   const sortedDays = sortBy(Object.values(allDays), ["day"]);
@@ -181,4 +183,5 @@ module.exports = {
   handleBombMessageScrapeInteraction,
   handleSlinnVodaScoreScrapeInteraction,
   handleSchedulingButtonInteraction,
+  BLANK_EMBED_FIELD,
 };

@@ -93,6 +93,8 @@ const calculateFourTwentyProximity = (msgCreatedTimestamp, bombTimezone) => {
   };
 };
 
+const getCurrentWeek = () => DateTime.now().startOf("week").toISODate();
+
 module.exports = {
   isFourTwenty,
   getNiceDate,
@@ -101,4 +103,5 @@ module.exports = {
   getAMorPM,
   matchesBombHour,
   BOMB_TIME_MINUTE,
+  getCurrentWeek,
 };

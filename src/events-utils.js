@@ -6,6 +6,7 @@ const handleCreateGuildEvent = async ({
   scheduledStartTime,
   description,
 }) => {
+  console.log(`CREATING EVENT for ${scheduledStartTime}`);
   const guildEventManager = new GuildScheduledEventManager(guild);
   const voiceChannel = await guild.channels.fetch(process.env.VOICE_CHANNEL_ID);
 

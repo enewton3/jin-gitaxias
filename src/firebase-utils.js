@@ -10,6 +10,7 @@ const {
 } = require("firebase/database");
 const { has, invert, mapValues } = require("lodash");
 const { DateTime } = require("luxon");
+const { getCurrentWeek } = require("./time-utils");
 
 require("dotenv").config();
 
@@ -162,6 +163,27 @@ const getUsersForGameNights = async (week) => {
   }
 };
 
+const toggleUserInterestForGameNightTime = async (week, day, time, userId) => {
+  const userInterestRef = ref(
+    db,
+    makeGameNightPath(`${week}/days/${day}/times/${time}/${userId}`)
+  );
+  await runTransaction(userInterestRef, (userInterest) => !userInterest);
+};
+
+const getUsersForGameNightTimes = async (week, day) => {
+  const dbRef = ref(db);
+
+  try {
+    const resp = await get(
+      child(dbRef, makeGameNightPath(`${week}/days/${day}/times`))
+    );
+    return resp.val();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 module.exports = {
   sendBombMsgToDB,
   getBombMsgsFromDB,
@@ -173,4 +195,6 @@ module.exports = {
   storeSchedulingMemeRecord,
   toggleUserInterestForGameNight,
   getUsersForGameNights,
+  toggleUserInterestForGameNightTime,
+  getUsersForGameNightTimes,
 };
