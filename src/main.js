@@ -106,8 +106,6 @@ client.on("interactionCreate", async (interaction) => {
 
     if (interaction.commandName === "itstimetoduel") {
       await handleSchedulingInteraction(interaction, client);
-      interaction.channel.createMessageComponentCollector;
-
       await schedulerJobScheduler(interaction.channelId, client);
     }
 
