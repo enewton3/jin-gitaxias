@@ -22,7 +22,10 @@ const {
 } = require("./messages");
 const { maybeHandleSlinnVodaScore } = require("./reactions");
 const { isActiveServer, isProduction, isTESTChannel } = require("./utils/env");
-const { handleSchedulingTimeButtonInteraction } = require("./utils/scheduling");
+const {
+  handleSchedulingTimeButtonInteraction,
+  schedulerJobScheduler,
+} = require("./utils/scheduling");
 const { BOMB_TIME_MINUTE } = require("./utils/time");
 
 const botId = process.env.BOT_TOKEN;

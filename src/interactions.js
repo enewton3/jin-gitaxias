@@ -18,7 +18,7 @@ const {
 } = require("./utils/firebase");
 const { getBombMatches, getTimezoneForEmoji } = require("./utils/emotes");
 const { getMemeCaptions, MAX_BOXES } = require("./utils/scheduling");
-const { isFourTwenty } = require("./utils/time");
+const { isFourTwenty, getCurrentWeek } = require("./utils/time");
 
 const imgflip = new Imgflip({
   username: process.env.IMGFLIP_USERNAME,

@@ -7,6 +7,7 @@ const {
 } = require("discord.js");
 const { sample, max, pickBy } = require("lodash");
 const { DateTime } = require("luxon");
+const { getGuild, getGuildChannel } = require("./env");
 const { handleCreateGuildEvent } = require("./events");
 const {
   getUsersForGameNights,
@@ -67,12 +68,10 @@ const getMemeCaptions = (meme) => {
 const schedulerJobScheduler = (channelId, client) => {
   const now = DateTime.now();
   const today = now.weekday;
-  const thursday = 4;
-  const friday = 5;
 
-  const daysTillThursday = (thursday - today + 7) % 7;
-  const schedulerJobDate = now.plus({ days: daysTillThursday });
-  // const schedulerJobDate = now.plus({ seconds: 20 });
+  const daysTillThursday = (weekdaysMap.thursday - today + 7) % 7;
+  // const schedulerJobDate = now.plus({ days: daysTillThursday });
+  const schedulerJobDate = now.plus({ seconds: 20 });
 
   const scheduler = new CronJob(new Date(schedulerJobDate), () =>
     schedulerJob(channelId, client)
@@ -85,9 +84,8 @@ const schedulerJobScheduler = (channelId, client) => {
   );
   scheduler.start();
 
-  const daysTillFriday = (friday - today + 7) % 7;
-  // const fridayJobDate = now.plus({ seconds: 40 });
-  const fridayJobDate = now.plus({ days: daysTillFriday });
+  const fridayJobDate = now.plus({ seconds: 40 });
+  // const fridayJobDate = now.plus({ days: daysTillThursday + 1 });
 
   const eventCreator = new CronJob(new Date(fridayJobDate), () =>
     eventCreatorJob(channelId, client)
@@ -120,7 +118,8 @@ const schedulerJob = async (channelId, client) => {
       };
     });
 
-  const chosenDays = daysArray.filter((day) => day.interestedGamers >= 3);
+  //change me back
+  const chosenDays = daysArray.filter((day) => day.interestedGamers >= 1);
 
   chosenDays.forEach(async (day) => {
     const userIdsArray = Object.keys(day.users);
@@ -155,8 +154,8 @@ const schedulerJob = async (channelId, client) => {
       { name: `8:00pm`, value: "No gamers", inline: true }
     );
 
-    const guild = await client.guilds.fetch(`${process.env.SERVER_ID}`);
-    const channel = await guild.channels.fetch(`${channelId}`);
+    const guild = await getGuild(client);
+    const channel = await getGuildChannel(guild, channelId);
     channel.send({
       content: `${usernamesString} \n PICK A TIME FOR ${day.day.toUpperCase()} YOU FOOLS`,
       components: [row],
@@ -210,8 +209,8 @@ const eventCreatorJob = async (channelId, client) => {
   const currentWeek = getCurrentWeek();
   const days = await getUsersForGameNights(currentWeek);
 
-  const guild = await client.guilds.fetch(`${process.env.SERVER_ID}`);
-  const channel = await guild.channels.fetch(`${channelId}`);
+  const guild = await getGuild(client);
+  const channel = await getGuildChannel(guild, channelId);
 
   Object.entries(days).forEach((day) => {
     if (!day) return;
@@ -221,7 +220,7 @@ const eventCreatorJob = async (channelId, client) => {
     times.forEach(async (timeObj) => {
       const [time, users] = timeObj;
       //change me when push to prod
-      if (Object.entries(users).length >= 3) {
+      if (Object.entries(users).length >= 1) {
         const now = DateTime.now();
 
         const weekdayNum = weekdaysMap[dayObj.day];
