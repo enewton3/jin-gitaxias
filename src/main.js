@@ -57,14 +57,17 @@ client.on("ready", async () => {
 });
 
 client.on("messageCreate", (msg) => {
-  if (msg.channelId !== process.env.CHANNEL_ID) return;
   if (msg.author.id === process.env.BOT_CLIENT_ID) return;
+  if (msg.guildId !== process.env.SERVER_ID) return;
 
-  maybeHandleBombMessage(msg);
   maybeHandleCommanderDamageMessage(msg);
   maybeHandleForgetfulMessage(msg);
   maybeHandleGoodBot(msg);
   maybeHandleJinMention(msg);
+
+  if (msg.channelId !== process.env.CHANNEL_ID) return;
+
+  maybeHandleBombMessage(msg);
 });
 
 client.on("messageReactionAdd", async (reaction, user) => {
