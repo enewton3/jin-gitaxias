@@ -9,6 +9,7 @@ const { DateTime } = require("luxon");
 const { v4 } = require("uuid");
 
 const Imgflip = require("./imgflip").default;
+const Scryfall = require("./scryfall").default;
 const {
   getBombMsgsFromDB,
   getSlinnVodaScore,
@@ -16,7 +17,11 @@ const {
   storeSchedulingMemeRecord,
   getUsersForGameNights,
 } = require("./utils/firebase");
-const { getBombMatches, getTimezoneForEmoji } = require("./utils/emotes");
+const {
+  getBombMatches,
+  getTimezoneForEmoji,
+  manaCostToEmojiMap,
+} = require("./utils/emotes");
 const { getMemeCaptions, MAX_BOXES } = require("./utils/scheduling");
 const { isFourTwenty } = require("./utils/time");
 
@@ -24,6 +29,8 @@ const imgflip = new Imgflip({
   username: process.env.IMGFLIP_USERNAME,
   password: process.env.IMGFLIP_PASSWORD,
 });
+
+const scryfall = new Scryfall();
 
 const handleBombStatsInteraction = async (interaction) => {
   const userBombMessages = await getBombMsgsFromDB(interaction.user.id);
@@ -53,6 +60,11 @@ const handleBombStatsInteraction = async (interaction) => {
 const handleSlinnVodaScoreInteraction = async (interaction) => {
   const userSlinnVodaScore = await getSlinnVodaScore(interaction.user.id);
   interaction.reply(`Your Slinn Voda Score is ${userSlinnVodaScore}`);
+};
+
+const handleJinVodaScoreInteraction = async (interaction) => {
+  const jinScore = await getSlinnVodaScore(process.env.BOT_CLIENT_ID);
+  interaction.reply(`Jin's Slinn Voda score is ${jinScore}. What a good bot!`);
 };
 
 const BLANK_EMBED_FIELD = { name: "\u200b", value: "\u200b" };
@@ -166,19 +178,53 @@ const handleSchedulingButtonInteraction = async (interaction) => {
   interaction.deferUpdate();
 };
 
-const handleBombMessageScrapeInteraction = (interaction) => {
-  interaction.reply("Will be supported eventually");
+const buildCardEmbed = (card) => {
+  const secondInlineField = card.power
+    ? {
+        name: "Power/Toughness",
+        value: `${card.power}/${card.toughness}`,
+        inline: true,
+      }
+    : { name: "Artist", value: `${card.artist}`, inline: true };
+
+  return new EmbedBuilder()
+    .setTitle(`${card.name}`)
+    .setURL(`${card.scryfall_uri}`)
+    .setDescription(`${card.type_line}`)
+    .addFields(
+      { name: "Oracle Text", value: `${card.oracle_text}` },
+      {
+        name: "Mana Cost",
+        value: `${manaCostToEmojiMap(card.mana_cost)}`,
+        inline: true,
+      },
+      { name: "\u200B", value: "\u200B", inline: true },
+      { ...secondInlineField }
+    )
+    .setImage(`${card.image_uris.normal}`)
+    .setTimestamp()
+    .setFooter({ text: "Brought to you by the glorious Jin-Gitaxias." });
 };
 
-const handleSlinnVodaScoreScrapeInteraction = (interaction) => {
-  interaction.reply("This will be supported soon");
+const handleCardInteraction = async (interaction) => {
+  if (interaction.options.getSubcommand() === "getrandomcommander") {
+    const resp = await scryfall.getRandomCommander();
+    const embed = buildCardEmbed(resp);
+    interaction.reply({ embeds: [embed] });
+  }
+
+  if (interaction.options.getSubcommand() === "getrandomcard") {
+    const resp = await scryfall.getRandomCard();
+    const embed = buildCardEmbed(resp);
+    interaction.reply({ embeds: [embed] });
+  }
 };
 
 module.exports = {
   handleBombStatsInteraction,
   handleSchedulingInteraction,
   handleSlinnVodaScoreInteraction,
-  handleBombMessageScrapeInteraction,
-  handleSlinnVodaScoreScrapeInteraction,
+  handleJinVodaScoreInteraction,
   handleSchedulingButtonInteraction,
+  handleCardInteraction,
 };

@@ -33,8 +33,24 @@ const commands = [
     .setName("slinnvodascore")
     .setDescription("Get your Slinn Voda Score!"),
   new SlashCommandBuilder()
+    .setName("jinvodascore")
+    .setDescription("Get's JinBot's Slinn Voda score. What a Good Bot!"),
+  new SlashCommandBuilder()
     .setName("itstimetoduel")
     .setDescription("Start a poll GIF to schedule a game night!"),
+  new SlashCommandBuilder()
+    .setName("cards")
+    .setDescription("Card interactions using Scryfall API!")
+    .addSubcommand(
+      new SlashCommandSubcommandBuilder()
+        .setName("getrandomcard")
+        .setDescription("Grabs a random card from Scryfall")
+    )
+    .addSubcommand(
+      new SlashCommandSubcommandBuilder()
+        .setName("getrandomcommander")
+        .setDescription("Grabs a random Commander eligible card from Scryfall")
+    ),
 ].map((command) => command.toJSON());
 
 const emptyCommands = [];

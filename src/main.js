@@ -11,6 +11,9 @@ const {
   handleSchedulingInteraction,
   handleSlinnVodaScoreScrapeInteraction,
   handleSchedulingButtonInteraction,
+  handleRandomCardInteraction,
+  handleCardInteraction,
+  handleJinVodaScoreInteraction,
 } = require("./interactions");
 const {
   maybeHandleBombMessage,
@@ -60,6 +63,8 @@ client.on("messageCreate", (msg) => {
   if (msg.author.id === process.env.BOT_CLIENT_ID) return;
   if (msg.guildId !== process.env.SERVER_ID) return;
 
+  console.log(msg.content);
+
   maybeHandleCommanderDamageMessage(msg);
   maybeHandleForgetfulMessage(msg);
   maybeHandleGoodBot(msg);
@@ -102,15 +107,14 @@ client.on("interactionCreate", async (interaction) => {
 
     if (interaction.commandName === "itstimetoduel") {
       await handleSchedulingInteraction(interaction, client);
-      interaction.channel.createMessageComponentCollector;
     }
 
-    if (interaction.commandName === "bombmessagesscrape") {
-      await handleBombMessageScrapeInteraction(interaction);
+    if (interaction.commandName === "cards") {
+      await handleCardInteraction(interaction);
     }
 
-    if (interaction.commandName === "slinnvodascrape") {
-      await handleSlinnVodaScoreScrapeInteraction(interaction);
+    if (interaction.commandName === "jinvodascore") {
+      await handleJinVodaScoreInteraction(interaction);
     }
   }
 });
