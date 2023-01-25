@@ -50,6 +50,17 @@ const commands = [
       new SlashCommandSubcommandBuilder()
         .setName("getrandomcommander")
         .setDescription("Grabs a random Commander eligible card from Scryfall")
+    )
+    .addSubcommand(
+      new SlashCommandSubcommandBuilder()
+        .setName("getcard")
+        .setDescription("Search for a card using Scryfall Syntax")
+        .addStringOption((option) =>
+          option
+            .setName("cardname")
+            .setDescription("Card Name")
+            .setRequired(true)
+        )
     ),
 ].map((command) => command.toJSON());
 

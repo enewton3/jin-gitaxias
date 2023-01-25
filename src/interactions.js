@@ -24,6 +24,7 @@ const {
 } = require("./utils/emotes");
 const { getMemeCaptions, MAX_BOXES } = require("./utils/scheduling");
 const { isFourTwenty } = require("./utils/time");
+const { cardEmbedBuilder } = require("./utils/cards");
 
 const imgflip = new Imgflip({
   username: process.env.IMGFLIP_USERNAME,
@@ -178,45 +179,37 @@ const handleSchedulingButtonInteraction = async (interaction) => {
   interaction.deferUpdate();
 };
 
-const buildCardEmbed = (card) => {
-  const secondInlineField = card.power
-    ? {
-        name: "Power/Toughness",
-        value: `${card.power}/${card.toughness}`,
-        inline: true,
-      }
-    : { name: "Artist", value: `${card.artist}`, inline: true };
-
-  return new EmbedBuilder()
-    .setTitle(`${card.name}`)
-    .setURL(`${card.scryfall_uri}`)
-    .setDescription(`${card.type_line}`)
-    .addFields(
-      { name: "Oracle Text", value: `${card.oracle_text}` },
-      {
-        name: "Mana Cost",
-        value: `${manaCostToEmojiMap(card.mana_cost)}`,
-        inline: true,
-      },
-      { name: "\u200B", value: "\u200B", inline: true },
-      { ...secondInlineField }
-    )
-    .setImage(`${card.image_uris.normal}`)
-    .setTimestamp()
-    .setFooter({ text: "Brought to you by the glorious Jin-Gitaxias." });
-};
-
 const handleCardInteraction = async (interaction) => {
   if (interaction.options.getSubcommand() === "getrandomcommander") {
     const resp = await scryfall.getRandomCommander();
-    const embed = buildCardEmbed(resp);
-    interaction.reply({ embeds: [embed] });
+    if (resp.status >= 400) {
+      interaction.reply(`${resp.message}`);
+    } else {
+      const embed = cardEmbedBuilder(resp);
+      interaction.reply({ embeds: [embed] });
+    }
   }
 
   if (interaction.options.getSubcommand() === "getrandomcard") {
     const resp = await scryfall.getRandomCard();
-    const embed = buildCardEmbed(resp);
-    interaction.reply({ embeds: [embed] });
+    if (resp.status >= 400) {
+      interaction.reply(`${resp.message}`);
+    } else {
+      const embed = cardEmbedBuilder(resp);
+      interaction.reply({ embeds: [embed] });
+    }
+  }
+
+  if (interaction.options.getSubcommand() === "getcard") {
+    const cardName = interaction.options.get("cardname").value;
+    const resp = await scryfall.getCard(cardName);
+
+    if (resp.status >= 400) {
+      interaction.reply(`${resp.message}`);
+    } else {
+      const embed = cardEmbedBuilder(resp);
+      interaction.reply({ embeds: [embed] });
+    }
   }
 };
 

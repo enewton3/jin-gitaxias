@@ -63,8 +63,6 @@ client.on("messageCreate", (msg) => {
   if (msg.author.id === process.env.BOT_CLIENT_ID) return;
   if (msg.guildId !== process.env.SERVER_ID) return;
 
-  console.log(msg.content);
-
   maybeHandleCommanderDamageMessage(msg);
   maybeHandleForgetfulMessage(msg);
   maybeHandleGoodBot(msg);
