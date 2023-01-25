@@ -7,13 +7,10 @@ const { handleComboJob } = require("./combos");
 const {
   handleBombStatsInteraction,
   handleSlinnVodaScoreInteraction,
-  handleBombMessageScrapeInteraction,
-  handleSchedulingInteraction,
-  handleSlinnVodaScoreScrapeInteraction,
-  handleSchedulingButtonInteraction,
-  handleRandomCardInteraction,
-  handleCardInteraction,
   handleJinVodaScoreInteraction,
+  handleSchedulingInteraction,
+  handleSchedulingButtonInteraction,
+  handleCardInteraction,
 } = require("./interactions");
 const {
   maybeHandleBombMessage,
