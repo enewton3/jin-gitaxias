@@ -34,7 +34,7 @@ const commands = [
     .setDescription("Get your Slinn Voda Score!"),
   new SlashCommandBuilder()
     .setName("jinvodascore")
-    .setDescription("Get's JinBot's Slinn Voda score. What a Good Bot!"),
+    .setDescription("Get's JinBot's Slinn Voda score"),
   new SlashCommandBuilder()
     .setName("itstimetoduel")
     .setDescription("Start a poll GIF to schedule a game night!"),

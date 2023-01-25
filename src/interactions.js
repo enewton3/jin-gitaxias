@@ -17,11 +17,7 @@ const {
   storeSchedulingMemeRecord,
   getUsersForGameNights,
 } = require("./utils/firebase");
-const {
-  getBombMatches,
-  getTimezoneForEmoji,
-  manaCostToEmojiMap,
-} = require("./utils/emotes");
+const { getBombMatches, getTimezoneForEmoji } = require("./utils/emotes");
 const { getMemeCaptions, MAX_BOXES } = require("./utils/scheduling");
 const { isFourTwenty } = require("./utils/time");
 const { cardEmbedBuilder } = require("./utils/cards");
@@ -65,7 +61,9 @@ const handleSlinnVodaScoreInteraction = async (interaction) => {
 
 const handleJinVodaScoreInteraction = async (interaction) => {
   const jinScore = await getSlinnVodaScore(process.env.BOT_CLIENT_ID);
-  interaction.reply(`Jin's Slinn Voda score is ${jinScore}. What a good bot!`);
+  interaction.reply(
+    `My Slinn Voda score is ${jinScore}. What a good bot I am!`
+  );
 };
 
 const BLANK_EMBED_FIELD = { name: "\u200b", value: "\u200b" };
