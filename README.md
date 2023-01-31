@@ -13,6 +13,7 @@ A nerdy and very specific discord bot for In-Response
 
 ```
 /slinnvodascore
+/jinvodascore
 ```
 
 ```
@@ -20,6 +21,13 @@ A nerdy and very specific discord bot for In-Response
 ```
 
 ```
-/bombmessagesscrape
-/slinnvodascrape
+/cards
+  /getrandomcard
+  /getrandomcommander
+  /getcard
+    -> cardname or search params
+```
+
+```
+/serumvision
 ```
