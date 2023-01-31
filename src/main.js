@@ -11,6 +11,7 @@ const {
   handleSchedulingInteraction,
   handleSchedulingButtonInteraction,
   handleCardInteraction,
+  handleJinQuoteInteraction,
 } = require("./interactions");
 const {
   maybeHandleBombMessage,
@@ -21,6 +22,7 @@ const {
 } = require("./messages");
 const { maybeHandleSlinnVodaScore } = require("./reactions");
 const { isActiveServer, isProduction, isTESTChannel } = require("./utils/env");
+const { handleActivityChange } = require("./utils/jinquotes");
 const { BOMB_TIME_MINUTE } = require("./utils/time");
 
 const botId = process.env.BOT_TOKEN;
@@ -38,6 +40,7 @@ intents.add(
 const client = new Client({
   intents: intents,
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
+  presence: { activities: [{ name: "over Phyrexia", type: "WATCHING" }] },
 });
 
 client.on("ready", async () => {
@@ -54,6 +57,15 @@ client.on("ready", async () => {
   );
 
   comboJob.start();
+
+  const activityChangeJob = new cron.CronJob(
+    "*/5 * * * *",
+    () => handleActivityChange(client),
+    () => console.log("Changed Activity"),
+    true
+  );
+
+  activityChangeJob.start();
 });
 
 client.on("messageCreate", (msg) => {
@@ -110,6 +122,10 @@ client.on("interactionCreate", async (interaction) => {
 
     if (interaction.commandName === "jinvodascore") {
       await handleJinVodaScoreInteraction(interaction);
+    }
+
+    if (interaction.commandName === "serumvision") {
+      await handleJinQuoteInteraction(interaction);
     }
   }
 });

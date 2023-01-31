@@ -21,6 +21,7 @@ const { getBombMatches, getTimezoneForEmoji } = require("./utils/emotes");
 const { getMemeCaptions, MAX_BOXES } = require("./utils/scheduling");
 const { isFourTwenty } = require("./utils/time");
 const { cardEmbedBuilder } = require("./utils/cards");
+const { randomJinQuote } = require("./utils/jinquotes");
 
 const imgflip = new Imgflip({
   username: process.env.IMGFLIP_USERNAME,
@@ -211,6 +212,17 @@ const handleCardInteraction = async (interaction) => {
   }
 };
 
+const handleJinQuoteInteraction = (interaction) => {
+  const { cardName, quote, attribution } = randomJinQuote();
+
+  interaction.reply(
+    `***${quote}***
+    ${attribution !== "" ? attribution : ""}
+    *${cardName}*
+    `
+  );
+};
+
 module.exports = {
   handleBombStatsInteraction,
   handleSchedulingInteraction,
@@ -218,4 +230,5 @@ module.exports = {
   handleJinVodaScoreInteraction,
   handleSchedulingButtonInteraction,
   handleCardInteraction,
+  handleJinQuoteInteraction,
 };

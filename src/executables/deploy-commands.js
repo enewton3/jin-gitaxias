@@ -62,6 +62,9 @@ const commands = [
             .setRequired(true)
         )
     ),
+  new SlashCommandBuilder()
+    .setName("serumvision")
+    .setDescription("Responds with a random Jin flavor quote"),
 ].map((command) => command.toJSON());
 
 const emptyCommands = [];
