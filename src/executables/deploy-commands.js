@@ -33,8 +33,38 @@ const commands = [
     .setName("slinnvodascore")
     .setDescription("Get your Slinn Voda Score!"),
   new SlashCommandBuilder()
+    .setName("jinvodascore")
+    .setDescription("Get's JinBot's Slinn Voda score"),
+  new SlashCommandBuilder()
     .setName("itstimetoduel")
     .setDescription("Start a poll GIF to schedule a game night!"),
+  new SlashCommandBuilder()
+    .setName("cards")
+    .setDescription("Card interactions using Scryfall API!")
+    .addSubcommand(
+      new SlashCommandSubcommandBuilder()
+        .setName("getrandomcard")
+        .setDescription("Grabs a random card from Scryfall")
+    )
+    .addSubcommand(
+      new SlashCommandSubcommandBuilder()
+        .setName("getrandomcommander")
+        .setDescription("Grabs a random Commander eligible card from Scryfall")
+    )
+    .addSubcommand(
+      new SlashCommandSubcommandBuilder()
+        .setName("getcard")
+        .setDescription("Search for a card using Scryfall Syntax")
+        .addStringOption((option) =>
+          option
+            .setName("cardname")
+            .setDescription("Card Name")
+            .setRequired(true)
+        )
+    ),
+  new SlashCommandBuilder()
+    .setName("serumvision")
+    .setDescription("Responds with a random Jin flavor quote"),
 ].map((command) => command.toJSON());
 
 const emptyCommands = [];

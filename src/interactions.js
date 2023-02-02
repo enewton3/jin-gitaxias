@@ -9,6 +9,7 @@ const { DateTime } = require("luxon");
 const { v4 } = require("uuid");
 
 const Imgflip = require("./imgflip").default;
+const Scryfall = require("./scryfall").default;
 const {
   getBombMsgsFromDB,
   getSlinnVodaScore,
@@ -19,11 +20,15 @@ const {
 const { getBombMatches, getTimezoneForEmoji } = require("./utils/emotes");
 const { getMemeCaptions, MAX_BOXES } = require("./utils/scheduling");
 const { isFourTwenty } = require("./utils/time");
+const { cardEmbedBuilder } = require("./utils/cards");
+const { randomJinQuote } = require("./utils/jinquotes");
 
 const imgflip = new Imgflip({
   username: process.env.IMGFLIP_USERNAME,
   password: process.env.IMGFLIP_PASSWORD,
 });
+
+const scryfall = new Scryfall();
 
 const handleBombStatsInteraction = async (interaction) => {
   const userBombMessages = await getBombMsgsFromDB(interaction.user.id);
@@ -53,6 +58,13 @@ const handleBombStatsInteraction = async (interaction) => {
 const handleSlinnVodaScoreInteraction = async (interaction) => {
   const userSlinnVodaScore = await getSlinnVodaScore(interaction.user.id);
   interaction.reply(`Your Slinn Voda Score is ${userSlinnVodaScore}`);
+};
+
+const handleJinVodaScoreInteraction = async (interaction) => {
+  const jinScore = await getSlinnVodaScore(process.env.BOT_CLIENT_ID);
+  interaction.reply(
+    `My Slinn Voda score is ${jinScore}. What a good bot I am!`
+  );
 };
 
 const BLANK_EMBED_FIELD = { name: "\u200b", value: "\u200b" };
@@ -166,19 +178,57 @@ const handleSchedulingButtonInteraction = async (interaction) => {
   interaction.deferUpdate();
 };
 
-const handleBombMessageScrapeInteraction = (interaction) => {
-  interaction.reply("Will be supported eventually");
+const handleCardInteraction = async (interaction) => {
+  if (interaction.options.getSubcommand() === "getrandomcommander") {
+    const resp = await scryfall.getRandomCommander();
+    if (resp.status >= 400) {
+      interaction.reply(`${resp.message}`);
+    } else {
+      const embed = cardEmbedBuilder(resp);
+      interaction.reply({ embeds: [embed] });
+    }
+  }
+
+  if (interaction.options.getSubcommand() === "getrandomcard") {
+    const resp = await scryfall.getRandomCard();
+    if (resp.status >= 400) {
+      interaction.reply(`${resp.message}`);
+    } else {
+      const embed = cardEmbedBuilder(resp);
+      interaction.reply({ embeds: [embed] });
+    }
+  }
+
+  if (interaction.options.getSubcommand() === "getcard") {
+    const cardName = interaction.options.get("cardname").value;
+    const resp = await scryfall.getCard(cardName);
+
+    if (resp.status >= 400) {
+      interaction.reply(`${resp.message}`);
+    } else {
+      const embed = cardEmbedBuilder(resp);
+      interaction.reply({ embeds: [embed] });
+    }
+  }
 };
 
-const handleSlinnVodaScoreScrapeInteraction = (interaction) => {
-  interaction.reply("This will be supported soon");
+const handleJinQuoteInteraction = (interaction) => {
+  const { cardName, quote, attribution } = randomJinQuote();
+
+  interaction.reply(
+    `***${quote}***
+    ${attribution !== "" ? attribution : ""}
+    *${cardName}*
+    `
+  );
 };
 
 module.exports = {
   handleBombStatsInteraction,
   handleSchedulingInteraction,
   handleSlinnVodaScoreInteraction,
-  handleBombMessageScrapeInteraction,
-  handleSlinnVodaScoreScrapeInteraction,
+  handleJinVodaScoreInteraction,
   handleSchedulingButtonInteraction,
+  handleCardInteraction,
+  handleJinQuoteInteraction,
 };
