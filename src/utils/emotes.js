@@ -128,6 +128,7 @@ const manaEmojiMap = {
 };
 
 const manaCostToEmojiMap = (manaCost) => {
+  if (!manaCost || manaCost === "") return "";
   const replace = new RegExp(
     "{W}|{U}|{B}|{R}|{G}|{C}|{X}|{[0-9]+}|{A}|{S}|{T}|{Q}|{P}|{Y}|{Z}|{CHAOS}|{W/P}|{U/P}|{B/P}|{R/P}|{G/P}|{2/W}|{2/U}|{2/B}|{2/R}|{2/G}|{W/U}|{W/B}|{U/R}|{U/B}|{B/G}|{B/R}|{R/G}|{R/W}|{G/U}|{G/W}|{∞}|{½}|{HW}|{HR}|{W/B/P}|{W/U/P}|{U/B/P}|{U/R/P}|{B/G/P}|{B/R/P}|{R/G/P}|{R/W/P}|{G/U/P}|{G/W/P}",
     "gim"
