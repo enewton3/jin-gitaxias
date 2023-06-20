@@ -104,8 +104,7 @@ const maybeHandleForgetfulMessage = makeMatchingTextHandler(
     msg.reply(process.env.FORGOT_ABOUT_DRE_URL);
   },
   "forgot",
-  "forget",
-  "dre"
+  "forget"
 );
 
 const maybeHandleGoodBot = makeMatchingTextHandler(
