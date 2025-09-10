@@ -1,7 +1,12 @@
 require("dotenv").config();
 
 const cron = require("cron");
-const { Client, IntentsBitField, Partials } = require("discord.js");
+const {
+  Client,
+  IntentsBitField,
+  Partials,
+  GatewayIntentBits,
+} = require("discord.js");
 
 const { handleComboJob } = require("./combos");
 const {
@@ -32,7 +37,7 @@ const intents = new IntentsBitField();
 intents.add(
   IntentsBitField.Flags.GuildMessages,
   IntentsBitField.Flags.Guilds,
-  IntentsBitField.Flags.GuildEmojisAndStickers,
+  GatewayIntentBits.GuildExpressions,
   IntentsBitField.Flags.MessageContent,
   IntentsBitField.Flags.GuildMessageReactions
 );
@@ -43,7 +48,7 @@ const client = new Client({
   presence: { activities: [{ name: "over Phyrexia", type: "WATCHING" }] },
 });
 
-client.on("ready", async () => {
+client.on("clientReady", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
   console.log(`RUNNING IN ${process.env.NODE_ENV}`);
 
@@ -100,7 +105,9 @@ client.on("interactionCreate", async (interaction) => {
   if (!isProduction() && !isTESTChannel(interaction.channelId)) return;
 
   if (interaction.isButton()) {
-    if (interaction.message.interaction.commandName === "itstimetoduel") {
+    if (
+      interaction.message.interactionMetadata.commandName === "itstimetoduel"
+    ) {
       await handleSchedulingButtonInteraction(interaction);
     }
   } else if (interaction.isChatInputCommand()) {
@@ -125,7 +132,7 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (interaction.commandName === "serumvision") {
-      await handleJinQuoteInteraction(interaction);
+      handleJinQuoteInteraction(interaction);
     }
   }
 });
