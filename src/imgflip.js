@@ -1,7 +1,5 @@
 const { sample } = require("lodash");
 
-const axios = require("axios").default;
-
 const BASE_URL = "https://api.imgflip.com";
 
 class Imgflip {
@@ -11,15 +9,28 @@ class Imgflip {
   }
 
   async request(url, method, options) {
-    const response = await axios.request({
-      url,
+    const { params, data, headers, ...restOptions } = options || {};
+    const requestUrl = new URL(url, `${BASE_URL}/`);
+
+    if (params != null) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value != null) {
+          requestUrl.searchParams.append(key, value);
+        }
+      });
+    }
+
+    const response = await fetch(requestUrl, {
       method,
-      baseURL: BASE_URL,
-      headers: { Accept: "application/json", "Accept-Encoding": "identity" },
-      ...options,
+      headers: {
+        Accept: "application/json",
+        ...headers,
+      },
+      body: data,
+      ...restOptions,
     });
 
-    return response.data;
+    return await response.json();
   }
 
   async get(url, params, options) {
@@ -28,9 +39,15 @@ class Imgflip {
 
   async post(url, data, options) {
     const urlParams = new URLSearchParams(data);
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      ...(options?.headers || {}),
+    };
+
     return await this.request(url, "post", {
       data: urlParams.toString(),
       ...options,
+      headers,
     });
   }
 

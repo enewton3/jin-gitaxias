@@ -1,19 +1,42 @@
-const axios = require("axios").default;
-
 const BASE_URL = "https://api.scryfall.com";
 
 const colors = { W: "White", U: "Blue", B: "Black", R: "Red", G: "Green" };
 
 class Scryfall {
   async request(url, method, options) {
-    const response = await axios.request({
-      url,
+    const { params, data, headers, ...restOptions } = options || {};
+    const requestUrl = new URL(url, `${BASE_URL}/`);
+
+    if (params != null) {
+      const searchParams =
+        params instanceof URLSearchParams
+          ? params
+          : new URLSearchParams(params);
+      requestUrl.search = searchParams.toString();
+    }
+
+    const response = await fetch(requestUrl, {
       method,
-      baseURL: BASE_URL,
-      headers: { Accept: "application/json", "Accept-Encoding": "identity" },
-      ...options,
+      headers: {
+        Accept: "application/json",
+        ...headers,
+      },
+      body: data,
+      ...restOptions,
     });
-    return response.data;
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      const error = new Error(responseData?.details || response.statusText);
+      error.response = {
+        status: response.status,
+        data: responseData,
+      };
+      throw error;
+    }
+
+    return responseData;
   }
 
   async get(url, params, options) {
